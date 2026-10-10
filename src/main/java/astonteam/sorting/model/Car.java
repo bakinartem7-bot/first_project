@@ -31,6 +31,24 @@ public final class Car {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Car other)) {
+            return false;
+        }
+        return power == other.power
+                && year == other.year
+                && Objects.equals(model, other.model);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(power, model, year);
+    }
+
+    @Override
     public String toString() {
         return "Car{power=" + power + ", model='" + model + "', year=" + year + '}';
     }
