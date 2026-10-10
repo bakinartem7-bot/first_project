@@ -1,5 +1,8 @@
 package astonteam.sorting.model;
 
+import astonteam.sorting.validation.CarValidator;
+import astonteam.sorting.validation.ValidationResult;
+
 import java.util.Objects;
 
 public final class Car {
@@ -31,6 +34,24 @@ public final class Car {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Car other)) {
+            return false;
+        }
+        return power == other.power
+                && year == other.year
+                && Objects.equals(model, other.model);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(power, model, year);
+    }
+
+    @Override
     public String toString() {
         return "Car{power=" + power + ", model='" + model + "', year=" + year + '}';
     }
@@ -58,6 +79,10 @@ public final class Car {
 
         public Car build() {
             Objects.requireNonNull(model, "model");
+            ValidationResult result = new CarValidator().validate(power, model, year);
+            if (!result.isValid()) {
+                throw new IllegalArgumentException(result.message());
+            }
             return new Car(this);
         }
     }

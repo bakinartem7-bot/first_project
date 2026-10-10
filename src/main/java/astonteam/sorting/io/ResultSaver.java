@@ -16,7 +16,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -45,7 +44,7 @@ public final class ResultSaver {
         this.baseDirectory = directory.toAbsolutePath().normalize();
     }
 
-    public Path saveReport(Collection<Car> source, Collection<Car> sorted, SortingStatistics statistics) {
+    public Path saveReport(Iterable<Car> source, Iterable<Car> sorted, SortingStatistics statistics) {
         Objects.requireNonNull(statistics, "statistics");
         List<Car> sourceCars = checkedCopy(source, "исходная коллекция");
         List<Car> sortedCars = checkedCopy(sorted, "отсортированная коллекция");
@@ -64,7 +63,7 @@ public final class ResultSaver {
         return file;
     }
 
-    public Path saveCollection(String fileName, Collection<Car> cars) {
+    public Path saveCollection(String fileName, Iterable<Car> cars) {
         Objects.requireNonNull(cars, "cars");
         List<Car> checked = checkedCopy(cars, "коллекция");
         Path file = resolveSafe(fileName);
@@ -90,9 +89,9 @@ public final class ResultSaver {
         return resolved;
     }
 
-    private List<Car> checkedCopy(Collection<Car> cars, String name) {
+    private List<Car> checkedCopy(Iterable<Car> cars, String name) {
         Objects.requireNonNull(cars, name);
-        List<Car> copy = new ArrayList<>(cars.size());
+        List<Car> copy = new ArrayList<>();
         for (Car car : cars) {
             if (car == null) {
                 throw new IllegalArgumentException("В " + name + " найден null-элемент");
@@ -113,7 +112,7 @@ public final class ResultSaver {
         }
     }
 
-    private List<String> carTable(String title, Collection<Car> cars) {
+    private List<String> carTable(String title, List<Car> cars) {
         List<String> lines = new ArrayList<>();
         lines.add("");
         lines.add("-- " + title + " --");

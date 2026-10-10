@@ -32,11 +32,6 @@ class CarLineFormatTest {
     }
 
     @Test
-    void formatRejectsBlankModel() {
-        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.format(car(150, "   ", 2015)));
-    }
-
-    @Test
     void formatRejectsDelimiterInModel() {
         assertThrows(IllegalArgumentException.class, () -> CarLineFormat.format(car(150, "A;B", 2015)));
     }

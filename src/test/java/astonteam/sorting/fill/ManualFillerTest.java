@@ -1,14 +1,13 @@
 package astonteam.sorting.fill;
 
 import astonteam.sorting.TestSupport;
+import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.common.Limits;
 import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.console.EndOfInputException;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.validation.CarValidator;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -23,7 +22,7 @@ class ManualFillerTest {
         TestSupport.Outcome outcome = TestSupport.run(
                 "150\nToyota\n2015\n90\nBMW\n2010\n", () -> {
                     ConsoleInput input = new ConsoleInput();
-                    List<Car> cars = new ManualFiller(input, validator).fill(2);
+                    CarArrayList cars = new ManualFiller(input, validator).fill(2);
                     assertEquals(2, cars.size());
                     assertEquals("Toyota", cars.get(0).getModel());
                     assertEquals(150, cars.get(0).getPower());
@@ -60,7 +59,7 @@ class ManualFillerTest {
     void fillRetriesAfterNonNumericField() {
         TestSupport.run("abc\n150\nToyota\n2015\n", () -> {
             ConsoleInput input = new ConsoleInput();
-            List<Car> cars = new ManualFiller(input, validator).fill(1);
+            CarArrayList cars = new ManualFiller(input, validator).fill(1);
             assertEquals(1, cars.size());
             assertEquals(150, cars.get(0).getPower());
             input.close();
@@ -71,7 +70,7 @@ class ManualFillerTest {
     void fillRetriesAfterValidationFailure() {
         TestSupport.run("0\nToyota\n2015\n150\nToyota\n2015\n", () -> {
             ConsoleInput input = new ConsoleInput();
-            List<Car> cars = new ManualFiller(input, validator).fill(1);
+            CarArrayList cars = new ManualFiller(input, validator).fill(1);
             assertEquals(1, cars.size());
             assertEquals(150, cars.get(0).getPower());
             input.close();
@@ -82,7 +81,7 @@ class ManualFillerTest {
     void fillRetriesAfterEmptyModel() {
         TestSupport.run("\nToyota\n150\nToyota\n2015\n", () -> {
             ConsoleInput input = new ConsoleInput();
-            List<Car> cars = new ManualFiller(input, validator).fill(1);
+            CarArrayList cars = new ManualFiller(input, validator).fill(1);
             assertEquals("Toyota", cars.get(0).getModel());
             input.close();
         });
