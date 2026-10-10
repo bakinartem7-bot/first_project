@@ -3,6 +3,7 @@
 
 ## Что сделано
 
+
 - **Модель**: `model.Car` (поля `power`, `model`, `year`) с паттерном Builder
   и методами `equals`/`hashCode`.
 - **Коллекция**: `collection.CarArrayList` — собственная коллекция на динамическом
@@ -14,6 +15,7 @@
   - модель — не пустая и не null;
   - год — от 1886 до 2026;
   - при нарушении правил `build()` бросает `IllegalArgumentException`.
+
 - **Консоль**: `console.ConsoleInput` (чтение строки и числа с проверкой диапазона),
   `console.Menu` / `console.MenuItem`, лимит неудачных попыток
   (`AttemptsExceededException`) и обработка конца ввода (`EndOfInputException`).
