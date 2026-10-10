@@ -24,6 +24,30 @@ class CarTest {
     }
 
     @Test
+    void buildRejectsBlankModel() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(150).model("   ").year(2015).build());
+    }
+
+    @Test
+    void buildRejectsNegativePower() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(-1).model("Toyota").year(2015).build());
+    }
+
+    @Test
+    void buildRejectsPowerOutOfRange() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(2001).model("Toyota").year(2015).build());
+    }
+
+    @Test
+    void buildRejectsYearOutOfRange() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(150).model("Toyota").year(1800).build());
+    }
+
+    @Test
     void toStringContainsFields() {
         Car car = Car.builder().power(99).model("Focus").year(2009).build();
         String text = car.toString();

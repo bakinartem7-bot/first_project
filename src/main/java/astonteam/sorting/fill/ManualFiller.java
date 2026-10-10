@@ -1,16 +1,13 @@
 package astonteam.sorting.fill;
 
-import astonteam.sorting.collection.CarList;
+import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.common.Limits;
 import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.validation.CarValidator;
 import astonteam.sorting.validation.ValidationResult;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public final class ManualFiller {
 
@@ -26,7 +23,7 @@ public final class ManualFiller {
         this.validator = Objects.requireNonNull(validator, "validator");
     }
 
-    public List<Car> fill(int size) {
+    public CarArrayList fill(int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("Размер массива должен быть больше нуля: " + size);
         }
@@ -34,9 +31,11 @@ public final class ManualFiller {
             throw new IllegalArgumentException("Максимальный размер массива: " + Limits.MAX_COLLECTION_SIZE);
         }
         System.out.printf("Введите %d автомобилей, заполняя поля по одному:%n", size);
-        return IntStream.rangeClosed(1, size)
-                .mapToObj(this::readCar)
-                .collect(Collectors.toCollection(CarList::new));
+        CarArrayList cars = new CarArrayList();
+        for (int i = 1; i <= size; i++) {
+            cars.add(readCar(i));
+        }
+        return cars;
     }
 
     private Car readCar(int index) {

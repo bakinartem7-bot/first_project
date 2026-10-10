@@ -56,13 +56,6 @@ class ResultSaverTest {
     }
 
     @Test
-    void saveCollectionRejectsBlankModel() {
-        ResultSaver saver = new ResultSaver(directory);
-        assertThrows(IllegalArgumentException.class,
-                () -> saver.saveCollection("cars.txt", List.of(car(150, "   ", 2015))));
-    }
-
-    @Test
     void saveCollectionRejectsControlCharsInModel() {
         ResultSaver saver = new ResultSaver(directory);
         assertThrows(IllegalArgumentException.class,

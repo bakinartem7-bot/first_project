@@ -1,5 +1,8 @@
 package astonteam.sorting.model;
 
+import astonteam.sorting.validation.CarValidator;
+import astonteam.sorting.validation.ValidationResult;
+
 import java.util.Objects;
 
 public final class Car {
@@ -76,6 +79,10 @@ public final class Car {
 
         public Car build() {
             Objects.requireNonNull(model, "model");
+            ValidationResult result = new CarValidator().validate(power, model, year);
+            if (!result.isValid()) {
+                throw new IllegalArgumentException(result.message());
+            }
             return new Car(this);
         }
     }
