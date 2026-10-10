@@ -1,0 +1,136 @@
+package astonteam.sorting.io;
+
+import astonteam.sorting.common.Limits;
+import astonteam.sorting.model.Car;
+import astonteam.sorting.stats.SortingStatistics;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ResultSaverTest {
+
+    @TempDir
+    Path directory;
+
+    private static Car car(int power, String model, int year) {
+        return Car.builder().power(power).model(model).year(year).build();
+    }
+
+    @Test
+    void saveCollectionWritesUtf8Lines() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        Path file = saver.saveCollection("cars.txt", List.of(car(150, "Toyota", 2015)));
+        assertEquals(directory.resolve("cars.txt"), file);
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        assertEquals("150;Toyota;2015" + System.lineSeparator(), content);
+    }
+
+    @Test
+    void saveCollectionWritesMultipleLines() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        Path file = saver.saveCollection("cars.txt",
+                List.of(car(150, "Toyota", 2015), car(90, "BMW", 2010)));
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        assertEquals("150;Toyota;2015" + System.lineSeparator()
+                + "90;BMW;2010" + System.lineSeparator(), content);
+    }
+
+    @Test
+    void saveCollectionRejectsNullElement() {
+        ResultSaver saver = new ResultSaver(directory);
+        List<Car> cars = new ArrayList<>();
+        cars.add(null);
+        assertThrows(IllegalArgumentException.class, () -> saver.saveCollection("cars.txt", cars));
+    }
+
+    @Test
+    void saveCollectionRejectsBlankModel() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("cars.txt", List.of(car(150, "   ", 2015))));
+    }
+
+    @Test
+    void saveCollectionRejectsControlCharsInModel() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("cars.txt", List.of(car(150, "A\tB", 2015))));
+    }
+
+    @Test
+    void failedSaveDoesNotCreateFile() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("cars.txt", List.of(car(150, "A;B", 2015))));
+        assertFalse(Files.exists(directory.resolve("cars.txt")));
+    }
+
+    @Test
+    void failedSaveKeepsPreviousFileContent() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        Path file = saver.saveCollection("cars.txt", List.of(car(150, "Toyota", 2015)));
+        String before = Files.readString(file, StandardCharsets.UTF_8);
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("cars.txt", List.of(car(150, "A;B", 2015))));
+        assertEquals(before, Files.readString(file, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void saveCollectionRejectsBlankFileName() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("   ", List.of(car(150, "Toyota", 2015))));
+    }
+
+    @Test
+    void saveCollectionRejectsUnsafeFileName() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("bad/name.txt", List.of(car(150, "Toyota", 2015))));
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("../escape.txt", List.of(car(150, "Toyota", 2015))));
+    }
+
+    @Test
+    void saveCollectionRejectsTooLongFileName() {
+        ResultSaver saver = new ResultSaver(directory);
+        String name = "a".repeat(Limits.MAX_FILE_NAME_LENGTH + 1) + ".txt";
+        assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection(name, List.of(car(150, "Toyota", 2015))));
+    }
+
+    @Test
+    void saveReportWritesReportFile() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        SortingStatistics statistics =
+                new SortingStatistics("Bubble", "power", 1, 0, 0, Duration.ofMillis(1));
+        Path file = saver.saveReport(
+                List.of(car(150, "Toyota", 2015)),
+                List.of(car(150, "Toyota", 2015)),
+                statistics);
+        assertTrue(Files.exists(file));
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        assertTrue(content.contains("Bubble"));
+        assertTrue(content.contains("Toyota"));
+        assertTrue(content.contains("Отчёт о сортировке"));
+    }
+
+    @Test
+    void saveReportRejectsNullStatistics() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(NullPointerException.class,
+                () -> saver.saveReport(List.of(), List.of(), null));
+    }
+}
