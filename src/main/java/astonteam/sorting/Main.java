@@ -8,6 +8,7 @@ import astonteam.sorting.console.EndOfInputException;
 import astonteam.sorting.console.Menu;
 import astonteam.sorting.console.MenuItem;
 import astonteam.sorting.fill.ManualFiller;
+import astonteam.sorting.fill.RandomFiller;
 import astonteam.sorting.io.ResultSaver;
 import astonteam.sorting.validation.CarValidator;
 
@@ -21,11 +22,14 @@ public class Main {
         CarValidator validator = new CarValidator();
         ResultSaver saver = new ResultSaver();
 
+        RandomFiller randomFiller = new RandomFiller(validator);
+
         try (ConsoleInput input = new ConsoleInput()) {
             Menu menu = new Menu("Главное меню", List.of(
                     new MenuItem(1, "Заполнить массив вручную"),
-                    new MenuItem(2, "Сохранить коллекцию в файл"),
-                    new MenuItem(3, "Выход")));
+                    new MenuItem(2, "Заполнить массив случайно"),
+                    new MenuItem(3, "Сохранить коллекцию в файл"),
+                    new MenuItem(4, "Выход")));
             boolean running = true;
             while (running) {
                 try {
@@ -35,8 +39,13 @@ public class Main {
                             cars = new ManualFiller(input, validator).fill(size);
                             System.out.println("Автомобилей введено: " + cars.size());
                         }
-                        case 2 -> saver.saveCollection("cars.txt", cars);
-                        case 3 -> running = false;
+                        case 2 -> {
+                            int size = input.readInt("Количество авто: ", 1, Limits.MAX_COLLECTION_SIZE);
+                            cars = randomFiller.fill(size);
+                            System.out.println("Автомобилей сгенерировано: " + cars.size());
+                        }
+                        case 3 -> saver.saveCollection("cars.txt", cars);
+                        case 4 -> running = false;
                         default -> System.out.println("Пункт в работе.");
                     }
                 } catch (AttemptsExceededException | IllegalArgumentException | UncheckedIOException e) {
