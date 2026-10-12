@@ -12,16 +12,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class InsertionSortTest {
     private CarArrayList cars;
 
+    private static Car car(int power, String model, int year) {
+        return Car.builder()
+                .power(power)
+                .model(model)
+                .year(year)
+                .build();
+    }
+
     @BeforeEach
     void setUp() {
         cars = new CarArrayList();
         for (int i = 0; i < 100; i++) {
             cars.add(
-                    Car.builder()
-                            .model("Model" + i)
-                            .year(2000 + (i % 27))
-                            .power(100 + i)
-                            .build()
+                    car(100 + i, "Model" + i, 2000 + (i % 27))
             );
         }
     }
@@ -71,7 +75,7 @@ class InsertionSortTest {
     @Test
     void whenSortingSingleElementCollectionThenNoException() {
         CarArrayList singleCar = new CarArrayList();
-        singleCar.add(Car.builder().model("Solo").year(2020).power(150).build());
+        singleCar.add(car(150, "Solo", 2020));
         new InsertionSort("power").sort(singleCar, CarComparators.BY_POWER);
         assertEquals("Solo", singleCar.get(0).getModel(),
                 "Элемент коллекции должен оставаться неизменным после сортировки");
@@ -97,16 +101,8 @@ class InsertionSortTest {
 
     @Test
     void whenCollectionHasDuplicatesThenSortedCorrectly() {
-        cars.add(Car.builder()
-                .model("Model50")
-                .year(2025)
-                .power(150)
-                .build());
-        cars.add(Car.builder()
-                .model("Model50")
-                .year(2025)
-                .power(150)
-                .build());
+        cars.add(car(150, "Model50", 2025));
+        cars.add(car(150, "Model50", 2025));
         new InsertionSort("power").sort(cars, CarComparators.BY_POWER);
         for (int i = 1; i < cars.size(); i++) {
             assertTrue(
@@ -117,17 +113,22 @@ class InsertionSortTest {
     }
 
     @Test
+    void whenSortingReverseOrderedCollectionThenItBecomesSorted() {
+        CarArrayList testCars = new CarArrayList();
+
+        testCars.add(car(300, "C", 2022));
+        testCars.add(car(200, "B", 2021));
+        testCars.add(car(100, "A", 2020));
+        new InsertionSort("power").sort(testCars, CarComparators.BY_POWER);
+        assertEquals(100, testCars.get(0).getPower());
+        assertEquals(200, testCars.get(1).getPower());
+        assertEquals(300, testCars.get(2).getPower());
+    }
+
+    @Test
     void whenEqualPowerThenOriginalOrderIsPreserved() {
-        Car first = Car.builder()
-                .model("First")
-                .year(2020)
-                .power(150)
-                .build();
-        Car second = Car.builder()
-                .model("Second")
-                .year(2021)
-                .power(150)
-                .build();
+        Car first = car(150, "First", 2020);
+        Car second = car(150, "Second", 2021);
         CarArrayList testCars = new CarArrayList();
         testCars.add(first);
         testCars.add(second);
