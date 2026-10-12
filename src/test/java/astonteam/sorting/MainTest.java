@@ -53,7 +53,9 @@ class MainTest {
         byte[] previous = Files.exists(carsFile) ? Files.readAllBytes(carsFile) : null;
         try {
             TestSupport.Outcome outcome =
-                    TestSupport.run("1\n1\n150\nToyota\n2015\n2\n3\n", () -> Main.main(new String[0]));
+                    TestSupport.run("1\n1\n150\nToyota\n2015\n3\n4\n",
+                            () -> Main.main(new String[0])
+                    );
             assertNull(outcome.error());
             assertTrue(outcome.output().contains("Файл сохранён"));
             assertTrue(Files.exists(carsFile));
