@@ -21,26 +21,37 @@ public class InsertionSort implements SortStrategy {
         Objects.requireNonNull(comparator, "comparator");
         String algorithmName = "InsertionSort";
         int size = cars.size();
-        long comparisons = 0;
-        long swaps = 0;
+        Counters counters = new Counters();
+
         long beginTime = System.nanoTime();
         for (int i = 1; i < cars.size(); i++) {
             Car key = cars.get(i);
             int j = i - 1;
             while (j >= 0) {
-                comparisons++;
+                counters.comparisons++;
                 if (comparator.compare(cars.get(j), key) <= 0) {
                     break;
                 }
                 cars.set(j + 1, cars.get(j));
-                swaps++;
+                counters.swaps++;
                 j--;
+            }
+            if (cars.get(j + 1) != key) {
+                counters.swaps++;
             }
             cars.set(j + 1, key);
         }
         Duration duration = Duration.ofNanos(
                 System.nanoTime() - beginTime
         );
-        return new SortingStatistics(algorithmName, sortField, size, comparisons, swaps, duration);
+        return new SortingStatistics(algorithmName, sortField, size, counters.comparisons, counters.swaps, duration);
+    }
+
+    private static final class Counters {
+        private long comparisons;
+
+        // Число сдвигов вправо и перемещений key,
+        // если ссылка в целевой позиции изменилась
+        private long swaps;
     }
 }

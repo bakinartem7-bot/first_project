@@ -12,9 +12,6 @@ public class MergeSort implements SortStrategy {
 
     private final String sortField;
 
-    private long comparisons;
-    private long swaps;
-
     public MergeSort(String sortField) {
         this.sortField = Objects.requireNonNull(sortField, "sortField");
     }
@@ -23,23 +20,23 @@ public class MergeSort implements SortStrategy {
     public SortingStatistics sort(CarArrayList cars, Comparator<Car> comparator) {
         Objects.requireNonNull(cars, "cars");
         Objects.requireNonNull(comparator, "comparator");
-        comparisons = 0;
-        swaps = 0;
         long startTime = System.nanoTime();
+
+        Counters counters = new Counters();
 
         CarArrayList temp = new CarArrayList();
         for (Car car : cars) {
             temp.add(car);
         }
 
-        mergeSort(cars, temp, 0, cars.size(), comparator);
+        mergeSort(cars, temp, 0, cars.size(), comparator, counters);
         Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
         return new SortingStatistics(
                 "MergeSort",
                 sortField,
                 cars.size(),
-                comparisons,
-                swaps,
+                counters.comparisons,
+                counters.swaps,
                 duration);
     }
 
@@ -48,16 +45,17 @@ public class MergeSort implements SortStrategy {
             CarArrayList temp,
             int left,
             int right,
-            Comparator<Car> comparator
+            Comparator<Car> comparator,
+            Counters counters
     ) {
         if (right - left <= 1) {
             return;
         }
         int middle = left + (right - left) / 2;
 
-        mergeSort(cars, temp, left, middle, comparator);
-        mergeSort(cars, temp, middle, right, comparator);
-        merge(cars, temp, left, middle, right, comparator);
+        mergeSort(cars, temp, left, middle, comparator, counters);
+        mergeSort(cars, temp, middle, right, comparator, counters);
+        merge(cars, temp, left, middle, right, comparator, counters);
     }
 
     private void merge(
@@ -66,14 +64,15 @@ public class MergeSort implements SortStrategy {
             int left,
             int middle,
             int right,
-            Comparator<Car> comparator
+            Comparator<Car> comparator,
+            Counters counters
     ) {
         int leftIndex = left;
         int rightIndex = middle;
         int tempIndex = left;
 
         while (leftIndex < middle && rightIndex < right) {
-            comparisons++;
+            counters.comparisons++;
             if (comparator.compare(cars.get(leftIndex), cars.get(rightIndex)) <= 0) {
                 temp.set(tempIndex++, cars.get(leftIndex++));
             } else {
@@ -90,8 +89,18 @@ public class MergeSort implements SortStrategy {
         }
 
         for (int i = left; i < right; i++) {
-            cars.set(i, temp.get(i));
-            swaps++;
+            Car mergedCar = temp.get(i);
+            if (cars.get(i) != mergedCar) {
+                counters.swaps++;
+            }
+            cars.set(i, mergedCar);
         }
+    }
+
+    private static final class Counters {
+        private long comparisons;
+
+        // Число позиций, в которых после слияния изменился объект
+        private long swaps;
     }
 }

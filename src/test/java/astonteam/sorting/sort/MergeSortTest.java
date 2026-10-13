@@ -174,12 +174,14 @@ class MergeSortTest {
 
     @Test
     void whenSortingThenStatisticsAreReturned() {
+        cars.add(car(300,"BMW", 2001));
+        cars.add(car(100,"Audi", 2002));
+        cars.add(car(200,"Lexus", 2003));
         SortingStatistics statistics =
                 new MergeSort("power").sort(cars, CarComparators.BY_POWER);
-
         assertEquals("MergeSort", statistics.algorithmName());
         assertEquals("power", statistics.sortField());
-        assertEquals(100, statistics.size());
+        assertEquals(103, statistics.size());
         assertTrue(statistics.comparisons() > 0);
         assertTrue(statistics.swaps() > 0);
         assertFalse(statistics.duration().isNegative(), "Продолжительность не может быть отрицательной");
