@@ -3,7 +3,6 @@ package astonteam.sorting.fill;
 import  astonteam.sorting.collection.CarArrayList;
 import  astonteam.sorting.common.Limits;
 import  astonteam.sorting.model.Car;
-import  astonteam.sorting.validation.CarValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,12 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomFillerTest {
     private RandomFiller randomFiller;
-    private CarValidator validator;
 
     @BeforeEach
     void setUp() {
-        validator = new CarValidator();
-        randomFiller = new RandomFiller(validator);
+        randomFiller = new RandomFiller();
     }
 
     @Test
