@@ -3,8 +3,6 @@ package astonteam.sorting.fill;
 import  astonteam.sorting.collection.CarArrayList;
 import  astonteam.sorting.common.Limits;
 import  astonteam.sorting.model.Car;
-import  astonteam.sorting.validation.CarValidator;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
