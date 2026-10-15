@@ -23,7 +23,7 @@ public class Main {
         CarValidator validator = new CarValidator();
         ResultSaver saver = new ResultSaver();
 
-        RandomFiller randomFiller = new RandomFiller(validator);
+        RandomFiller randomFiller = new RandomFiller();
         try (ConsoleInput input = new ConsoleInput()) {
             Menu menu = new Menu("Главное меню", List.of(
                     new MenuItem(1, "Заполнить массив вручную"),

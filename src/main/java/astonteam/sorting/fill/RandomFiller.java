@@ -3,18 +3,13 @@ package astonteam.sorting.fill;
 import  astonteam.sorting.collection.CarArrayList;
 import  astonteam.sorting.common.Limits;
 import  astonteam.sorting.model.Car;
-import  astonteam.sorting.validation.CarValidator;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 
 public final class RandomFiller {
 
-    private final CarValidator validator;
-
-    public RandomFiller(CarValidator validator) {
-        this.validator = Objects.requireNonNull(validator, "validator");
+    public RandomFiller() {
     }
 
     public CarArrayList fill(int size) {
@@ -36,9 +31,9 @@ public final class RandomFiller {
     }
 
     private Car generateRandomCar () {
-        int power = ThreadLocalRandom.current().nextInt(1, 2001);
+        int power = ThreadLocalRandom.current().nextInt(Limits.MIN_POWER, Limits.MAX_POWER + 1);
 
-        int year = ThreadLocalRandom.current().nextInt(1886, 2027);
+        int year = ThreadLocalRandom.current().nextInt(Limits.MIN_YEAR, Limits.MAX_YEAR + 1);
 
         String model = "Model-" + ThreadLocalRandom.current().nextInt(1000, 10000);
 
