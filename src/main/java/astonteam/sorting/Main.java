@@ -7,6 +7,7 @@ import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.console.EndOfInputException;
 import astonteam.sorting.console.Menu;
 import astonteam.sorting.console.MenuItem;
+import astonteam.sorting.console.SortingMenu;
 import astonteam.sorting.fill.ManualFiller;
 import astonteam.sorting.fill.RandomFiller;
 import astonteam.sorting.io.ResultSaver;
@@ -23,13 +24,14 @@ public class Main {
         ResultSaver saver = new ResultSaver();
 
         RandomFiller randomFiller = new RandomFiller(validator);
-
         try (ConsoleInput input = new ConsoleInput()) {
             Menu menu = new Menu("Главное меню", List.of(
                     new MenuItem(1, "Заполнить массив вручную"),
                     new MenuItem(2, "Заполнить массив случайно"),
-                    new MenuItem(3, "Сохранить коллекцию в файл"),
-                    new MenuItem(4, "Выход")));
+                    new MenuItem(3, "Сортировать коллекцию"),
+                    new MenuItem(4, "Сохранить коллекцию в файл"),
+                    new MenuItem(5, "Выход")
+            ));
             boolean running = true;
             while (running) {
                 try {
@@ -44,8 +46,9 @@ public class Main {
                             cars = randomFiller.fill(size);
                             System.out.println("Автомобилей сгенерировано: " + cars.size());
                         }
-                        case 3 -> saver.saveCollection("cars.txt", cars);
-                        case 4 -> running = false;
+                        case 3 -> SortingMenu.sortCars(cars, input);
+                        case 4 -> saver.saveCollection("cars.txt", cars);
+                        case 5 -> running = false;
                         default -> System.out.println("Пункт в работе.");
                     }
                 } catch (AttemptsExceededException | IllegalArgumentException | UncheckedIOException e) {
