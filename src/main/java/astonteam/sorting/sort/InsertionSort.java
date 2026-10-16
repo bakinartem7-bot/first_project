@@ -8,13 +8,33 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.Objects;
 
+/**
+ * Реализация сортировки вставками для коллекции автомобилей.
+ */
 public class InsertionSort implements SortStrategy {
+    /**
+     * Название поля, по которому выполняется сортировка (для статистики).
+     */
     private final String sortField;
 
+    /**
+     * Создаёт стратегию сортировки вставками для указанного поля.
+     *
+     * @param sortField название сортируемого поля
+     * @throws NullPointerException если {@code sortField} равен {@code null}
+     */
     public InsertionSort(String sortField) {
         this.sortField = Objects.requireNonNull(sortField);
     }
 
+    /**
+     * Сортирует коллекцию методом вставки, подсчитывая сравнения и перемещения.
+     *
+     * @param cars      сортируемая коллекция
+     * @param comparator компаратор, определяющий порядок сортировки
+     * @return статистика сортировки
+     * @throws NullPointerException если {@code cars} или {@code comparator} равны {@code null}
+     */
     @Override
     public SortingStatistics sort(CarArrayList cars, Comparator<Car> comparator) {
         Objects.requireNonNull(cars, "cars");
@@ -47,7 +67,13 @@ public class InsertionSort implements SortStrategy {
         return new SortingStatistics(algorithmName, sortField, size, counters.comparisons, counters.swaps, duration);
     }
 
+    /**
+     * Счётчики операций, накапливаемые во время сортировки.
+     */
     private static final class Counters {
+        /**
+         * Число сравнений элементов.
+         */
         private long comparisons;
 
         // Число сдвигов вправо и перемещений key,

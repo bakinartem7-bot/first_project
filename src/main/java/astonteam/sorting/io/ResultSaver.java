@@ -22,28 +22,55 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Сохраняет результаты сортировки и коллекции автомобилей в текстовые файлы.
+ */
 public final class ResultSaver {
 
+    /** Шаблон допустимого имени файла. */
     private static final Pattern SAFE_FILE_NAME =
             Pattern.compile("[A-Za-z0-9_.-]{1," + Limits.MAX_FILE_NAME_LENGTH + "}");
+    /** Формат метки времени в имени файла. */
     private static final DateTimeFormatter FILE_STAMP = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    /** Формат даты в отчёте. */
     private static final DateTimeFormatter DATE_STAMP = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+    /** Разделительная линия отчёта. */
     private static final String BORDER = "=".repeat(72);
+    /** Заголовок отчёта. */
     private static final String REPORT_TITLE = "Отчёт о сортировке";
+    /** Формат строки заголовка таблицы. */
     private static final String TABLE_HEADER = "%-4s %-10s %-24s %s";
+    /** Формат строки данных таблицы. */
     private static final String TABLE_ROW = "%-4d %-10d %-24s %d";
 
+    /** Базовый каталог для сохранения файлов. */
     private final Path baseDirectory;
 
+    /**
+     * Создаёт сохранитель с каталогом результатов по умолчанию.
+     */
     public ResultSaver() {
         this(Path.of("results"));
     }
 
+    /**
+     * Создаёт сохранитель с указанным каталогом.
+     *
+     * @param directory базовый каталог для сохранения файлов
+     */
     public ResultSaver(Path directory) {
         Objects.requireNonNull(directory, "directory");
         this.baseDirectory = directory.toAbsolutePath().normalize();
     }
 
+    /**
+     * Сохраняет отчёт о сортировке с исходной и отсортированной коллекциями.
+     *
+     * @param source     исходная коллекция автомобилей
+     * @param sorted     отсортированная коллекция автомобилей
+     * @param statistics статистика сортировки
+     * @return путь к сохранённому файлу
+     */
     public Path saveReport(Iterable<Car> source, Iterable<Car> sorted, SortingStatistics statistics) {
         Objects.requireNonNull(statistics, "statistics");
         List<Car> sourceCars = checkedCopy(source, "исходная коллекция");
@@ -63,6 +90,13 @@ public final class ResultSaver {
         return file;
     }
 
+    /**
+     * Сохраняет коллекцию автомобилей в файл с указанным именем.
+     *
+     * @param fileName имя файла для сохранения
+     * @param cars     коллекция автомобилей
+     * @return путь к сохранённому файлу
+     */
     public Path saveCollection(String fileName, Iterable<Car> cars) {
         Objects.requireNonNull(cars, "cars");
         List<Car> checked = checkedCopy(cars, "коллекция");
@@ -74,6 +108,12 @@ public final class ResultSaver {
         return file;
     }
 
+    /**
+     * Проверяет имя файла и строит безопасный путь внутри базового каталога.
+     *
+     * @param fileName имя файла
+     * @return нормализованный путь внутри базового каталога
+     */
     private Path resolveSafe(String fileName) {
         String name = TextSanitizer.normalize(fileName);
         if (name.isEmpty()) {
@@ -89,6 +129,13 @@ public final class ResultSaver {
         return resolved;
     }
 
+    /**
+     * Создаёт копию коллекции, проверяя элементы на null и корректность.
+     *
+     * @param cars коллекция автомобилей
+     * @param name имя коллекции для сообщений об ошибке
+     * @return список проверенных автомобилей
+     */
     private List<Car> checkedCopy(Iterable<Car> cars, String name) {
         Objects.requireNonNull(cars, name);
         List<Car> copy = new ArrayList<>();
@@ -102,6 +149,12 @@ public final class ResultSaver {
         return copy;
     }
 
+    /**
+     * Проверяет корректность модели автомобиля.
+     *
+     * @param car  автомобиль для проверки
+     * @param name имя коллекции для сообщений об ошибке
+     */
     private void requireValidCar(Car car, String name) {
         String model = car.getModel();
         if (model == null || model.isBlank()) {
@@ -112,6 +165,13 @@ public final class ResultSaver {
         }
     }
 
+    /**
+     * Формирует строки таблицы с автомобилями.
+     *
+     * @param title заголовок таблицы
+     * @param cars  автомобили для вывода
+     * @return строки таблицы
+     */
     private List<String> carTable(String title, List<Car> cars) {
         List<String> lines = new ArrayList<>();
         lines.add("");
@@ -126,6 +186,12 @@ public final class ResultSaver {
         return lines;
     }
 
+    /**
+     * Формирует строки блока статистики сортировки.
+     *
+     * @param statistics статистика сортировки
+     * @return строки блока статистики
+     */
     private List<String> statisticsBlock(SortingStatistics statistics) {
         List<String> lines = new ArrayList<>();
         lines.add("");
@@ -139,6 +205,12 @@ public final class ResultSaver {
         return lines;
     }
 
+    /**
+     * Записывает строки в файл атомарно через временный файл.
+     *
+     * @param file  целевой файл
+     * @param lines строки для записи
+     */
     private void write(Path file, List<String> lines) {
         Path temp = file.resolveSibling(file.getFileName() + ".tmp");
         try {
@@ -153,6 +225,13 @@ public final class ResultSaver {
         }
     }
 
+    /**
+     * Перемещает временный файл на место целевого, по возможности атомарно.
+     *
+     * @param temp временный файл
+     * @param file целевой файл
+     * @throws IOException при ошибке перемещения файла
+     */
     private void moveAtomically(Path temp, Path file) throws IOException {
         try {
             Files.move(temp, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
@@ -161,6 +240,11 @@ public final class ResultSaver {
         }
     }
 
+    /**
+     * Удаляет файл, игнорируя ошибки удаления.
+     *
+     * @param path путь к удаляемому файлу
+     */
     private void deleteQuietly(Path path) {
         try {
             Files.deleteIfExists(path);

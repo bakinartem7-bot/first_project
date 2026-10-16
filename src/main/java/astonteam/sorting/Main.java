@@ -19,8 +19,18 @@ import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Главный класс приложения: запускает консольное меню работы
+ * с коллекцией автомобилей (заполнение, сортировка, поиск, сохранение).
+ */
 public class Main {
 
+    /**
+     * Точка входа: выводит главное меню и обрабатывает команды пользователя
+     * до выбора пункта «Выход» или завершения ввода.
+     *
+     * @param args аргументы командной строки (не используются)
+     */
     public static void main(String[] args) {
         CarArrayList cars = new CarArrayList();
         CarValidator validator = new CarValidator();

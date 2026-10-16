@@ -19,15 +19,32 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Тесты для {@link ResultSaver}: сохранение коллекции автомобилей и отчёта о сортировке в файлы.
+ */
 class ResultSaverTest {
 
+    /**
+     * Временный каталог, в который сохраняются файлы в ходе тестов.
+     */
     @TempDir
     Path directory;
 
+    /**
+     * Создаёт тестовый автомобиль с указанными параметрами.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year год выпуска автомобиля
+     * @return построенный объект {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder().power(power).model(model).year(year).build();
     }
 
+    /**
+     * Проверяет, что сохранение одной машины записывает UTF-8 строки возвращённым файлом.
+     */
     @Test
     void saveCollectionWritesUtf8Lines() throws IOException {
         ResultSaver saver = new ResultSaver(directory);
@@ -37,6 +54,9 @@ class ResultSaverTest {
         assertEquals("150;Toyota;2015" + System.lineSeparator(), content);
     }
 
+    /**
+     * Проверяет, что несколько машин записываются в файл построчно в исходном порядке.
+     */
     @Test
     void saveCollectionWritesMultipleLines() throws IOException {
         ResultSaver saver = new ResultSaver(directory);
@@ -47,6 +67,9 @@ class ResultSaverTest {
                 + "90;BMW;2010" + System.lineSeparator(), content);
     }
 
+    /**
+     * Проверяет, что сохранение коллекции с null-элементом приводит к IllegalArgumentException.
+     */
     @Test
     void saveCollectionRejectsNullElement() {
         ResultSaver saver = new ResultSaver(directory);
@@ -55,6 +78,9 @@ class ResultSaverTest {
         assertThrows(IllegalArgumentException.class, () -> saver.saveCollection("cars.txt", cars));
     }
 
+    /**
+     * Проверяет, что модель с управляющими символами отклоняется при сохранении.
+     */
     @Test
     void saveCollectionRejectsControlCharsInModel() {
         ResultSaver saver = new ResultSaver(directory);
@@ -62,6 +88,9 @@ class ResultSaverTest {
                 () -> saver.saveCollection("cars.txt", List.of(car(150, "A\tB", 2015))));
     }
 
+    /**
+     * Проверяет, что при неудачном сохранении файл не создаётся.
+     */
     @Test
     void failedSaveDoesNotCreateFile() {
         ResultSaver saver = new ResultSaver(directory);
@@ -70,6 +99,9 @@ class ResultSaverTest {
         assertFalse(Files.exists(directory.resolve("cars.txt")));
     }
 
+    /**
+     * Проверяет, что при неудачном сохранении содержимое ранее записанного файла не меняется.
+     */
     @Test
     void failedSaveKeepsPreviousFileContent() throws IOException {
         ResultSaver saver = new ResultSaver(directory);
@@ -80,6 +112,9 @@ class ResultSaverTest {
         assertEquals(before, Files.readString(file, StandardCharsets.UTF_8));
     }
 
+    /**
+     * Проверяет, что пустое имя файла отклоняется при сохранении.
+     */
     @Test
     void saveCollectionRejectsBlankFileName() {
         ResultSaver saver = new ResultSaver(directory);
@@ -87,6 +122,9 @@ class ResultSaverTest {
                 () -> saver.saveCollection("   ", List.of(car(150, "Toyota", 2015))));
     }
 
+    /**
+     * Проверяет, что небезопасные имена файлов (с разделителями пути и выходом наружу) отклоняются.
+     */
     @Test
     void saveCollectionRejectsUnsafeFileName() {
         ResultSaver saver = new ResultSaver(directory);
@@ -96,6 +134,9 @@ class ResultSaverTest {
                 () -> saver.saveCollection("../escape.txt", List.of(car(150, "Toyota", 2015))));
     }
 
+    /**
+     * Проверяет, что имя файла длиннее допустимого лимита отклоняется.
+     */
     @Test
     void saveCollectionRejectsTooLongFileName() {
         ResultSaver saver = new ResultSaver(directory);
@@ -104,6 +145,9 @@ class ResultSaverTest {
                 () -> saver.saveCollection(name, List.of(car(150, "Toyota", 2015))));
     }
 
+    /**
+     * Проверяет, что отчёт сохраняется в файл и содержит сведения об алгоритме, машинах и заголовке.
+     */
     @Test
     void saveReportWritesReportFile() throws IOException {
         ResultSaver saver = new ResultSaver(directory);
@@ -120,6 +164,9 @@ class ResultSaverTest {
         assertTrue(content.contains("Отчёт о сортировке"));
     }
 
+    /**
+     * Проверяет, что сохранение отчёта с null-статистикой приводит к NullPointerException.
+     */
     @Test
     void saveReportRejectsNullStatistics() {
         ResultSaver saver = new ResultSaver(directory);

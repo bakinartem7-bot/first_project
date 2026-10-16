@@ -8,13 +8,35 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.Objects;
 
+/**
+ * Реализация сортировки вставками, применяющейся только к автомобилям
+ * с чётной мощностью (остальные позиции сохраняются).
+ */
 public class EvenPowerSort implements SortStrategy {
+    /**
+     * Название поля, по которому выполняется сортировка (для статистики).
+     */
     private final String sortField;
 
+    /**
+     * Создаёт стратегию сортировки чётных по мощности автомобилей для указанного поля.
+     *
+     * @param sortField название сортируемого поля
+     * @throws NullPointerException если {@code sortField} равен {@code null}
+     */
     public EvenPowerSort(String sortField) {
         this.sortField = Objects.requireNonNull(sortField, "sortField");
     }
 
+    /**
+     * Отбирает автомобили с чётной мощностью, сортирует их вставками
+     * и возвращает на исходные позиции, подсчитывая статистику.
+     *
+     * @param cars      сортируемая коллекция
+     * @param comparator компаратор, определяющий порядок сортировки
+     * @return статистика сортировки
+     * @throws NullPointerException если {@code cars} или {@code comparator} равны {@code null}
+     */
     @Override
     public SortingStatistics sort(CarArrayList cars, Comparator<Car> comparator) {
         Objects.requireNonNull(cars, "cars");
@@ -61,6 +83,15 @@ public class EvenPowerSort implements SortStrategy {
         return new SortingStatistics(algorithmName, sortField, size, counters.comparisons, counters.swaps, duration);
     }
 
+    /**
+     * Записывает автомобиль в заданную позицию, увеличивая счётчик
+     * перемещений, если ссылка в этой позиции изменилась.
+     *
+     * @param cars     коллекция, в которую выполняется запись
+     * @param index    индекс целевой позиции
+     * @param car      записываемый автомобиль
+     * @param counters счётчики операций сортировки
+     */
     private static void setAndCount(CarArrayList cars, int index, Car car, Counters counters) {
         if (cars.get(index) != car) {
             counters.swaps++;
@@ -68,7 +99,13 @@ public class EvenPowerSort implements SortStrategy {
         cars.set(index, car);
     }
 
+    /**
+     * Счётчики операций, накапливаемые во время сортировки.
+     */
     private static final class Counters {
+        /**
+         * Число сравнений элементов.
+         */
         private long comparisons;
 
         // Число записей, изменивших ссылку в коллекциях во время сортировки.

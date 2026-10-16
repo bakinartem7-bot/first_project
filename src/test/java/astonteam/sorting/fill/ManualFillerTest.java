@@ -13,10 +13,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Тесты для {@link ManualFiller}: ручной ввод автомобилей через консоль с валидацией и повторами.
+ */
 class ManualFillerTest {
 
+    /**
+     * Валидатор автомобилей, используемый заполняющим ручным способом.
+     */
     private final CarValidator validator = new CarValidator();
 
+    /**
+     * Проверяет, что заполнение читает из ввода ровно запрошенное количество машин.
+     */
     @Test
     void fillReadsRequestedNumberOfCars() {
         TestSupport.Outcome outcome = TestSupport.run(
@@ -33,6 +42,9 @@ class ManualFillerTest {
         assertNull(outcome.error());
     }
 
+    /**
+     * Проверяет, что неположительный размер коллекции приводит к IllegalArgumentException.
+     */
     @Test
     void fillRejectsNonPositiveSize() {
         TestSupport.run("", () -> {
@@ -44,6 +56,9 @@ class ManualFillerTest {
         });
     }
 
+    /**
+     * Проверяет, что размер коллекции больше допустимого лимита приводит к IllegalArgumentException.
+     */
     @Test
     void fillRejectsTooBigSize() {
         TestSupport.run("", () -> {
@@ -55,6 +70,9 @@ class ManualFillerTest {
         });
     }
 
+    /**
+     * Проверяет, что после ввода нечислового значения запрашивается повторный ввод.
+     */
     @Test
     void fillRetriesAfterNonNumericField() {
         TestSupport.run("abc\n150\nToyota\n2015\n", () -> {
@@ -66,6 +84,9 @@ class ManualFillerTest {
         });
     }
 
+    /**
+     * Проверяет, что после неудачной валидации введённых данных запрашивается повторный ввод.
+     */
     @Test
     void fillRetriesAfterValidationFailure() {
         TestSupport.run("0\nToyota\n2015\n150\nToyota\n2015\n", () -> {
@@ -77,6 +98,9 @@ class ManualFillerTest {
         });
     }
 
+    /**
+     * Проверяет, что пустая модель отклоняется и ввод повторяется.
+     */
     @Test
     void fillRetriesAfterEmptyModel() {
         TestSupport.run("\nToyota\n150\nToyota\n2015\n", () -> {
@@ -87,6 +111,9 @@ class ManualFillerTest {
         });
     }
 
+    /**
+     * Проверяет, что при окончании потока ввода бросается EndOfInputException.
+     */
     @Test
     void fillFailsOnEndOfInput() {
         TestSupport.run("150\n", () -> {
@@ -97,6 +124,9 @@ class ManualFillerTest {
         });
     }
 
+    /**
+     * Проверяет, что конструктор отклоняет null-зависимости (ввод и валидатор).
+     */
     @Test
     void constructorRejectsNullDependencies() {
         assertThrows(NullPointerException.class, () -> new ManualFiller(null, validator));

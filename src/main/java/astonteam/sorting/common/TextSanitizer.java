@@ -1,10 +1,22 @@
 package astonteam.sorting.common;
 
+/**
+ * Утилиты нормализации и проверки текстовых значений.
+ */
 public final class TextSanitizer {
 
+    /**
+     * Приватный конструктор для запрета создания экземпляров.
+     */
     private TextSanitizer() {
     }
 
+    /**
+     * Нормализует строку: заменяет спецпробелы, убирает управляющие символы и обрезает края.
+     *
+     * @param value исходное значение
+     * @return нормализованная строка, либо пустая строка для {@code null}
+     */
     public static String normalize(String value) {
         if (value == null) {
             return "";
@@ -22,10 +34,25 @@ public final class TextSanitizer {
         return builder.toString().trim();
     }
 
+    /**
+     * Проверяет наличие управляющих символов в строке.
+     *
+     * @param value проверяемое значение
+     * @return {@code true}, если строка содержит управляющие символы
+     */
     public static boolean hasControlChars(String value) {
         return value != null && value.chars().anyMatch(Character::isISOControl);
     }
 
+    /**
+     * Нормализует текст и проверяет его на пустоту и длину.
+     *
+     * @param value     исходное значение
+     * @param fieldName имя поля для сообщения об ошибке
+     * @param maxLength максимально допустимая длина
+     * @return нормализованный текст
+     * @throws IllegalArgumentException если текст пуст или длиннее {@code maxLength}
+     */
     public static String requireText(String value, String fieldName, int maxLength) {
         String normalized = normalize(value);
         if (normalized.isEmpty()) {

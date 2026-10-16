@@ -14,7 +14,18 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 
+/**
+ * Заполняет коллекцию автомобилями, считываемыми из текстового файла.
+ */
 public final class FileFiller {
+    /**
+     * Читает автомобили из файла и добавляет их в коллекцию.
+     *
+     * @param path путь к файлу с данными
+     * @return коллекция прочитанных автомобилей
+     * @throws IllegalArgumentException если файл не существует, недоступен или содержит некорректные данные
+     * @throws UncheckedIOException     при ошибке чтения файла
+     */
     public CarArrayList fill(Path path) {
         Objects.requireNonNull(path, "path");
 

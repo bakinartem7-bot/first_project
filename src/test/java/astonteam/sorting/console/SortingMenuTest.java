@@ -9,8 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Тесты для {@link SortingMenu}: сортировка коллекции различными алгоритмами и по разным полям.
+ */
 class SortingMenuTest {
 
+    /**
+     * Проверяет, что сортировка слиянием по мощности упорядочивает коллекцию.
+     */
     @Test
     void whenMergeSortByPowerThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -30,6 +36,9 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: MergeSort"));
     }
 
+    /**
+     * Проверяет, что сортировка слиянием по модели упорядочивает коллекцию и порядок вывода.
+     */
     @Test
     void whenMergeSortByModelThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -54,6 +63,9 @@ class SortingMenuTest {
         );
     }
 
+    /**
+     * Проверяет, что сортировка вставками по году упорядочивает коллекцию.
+     */
     @Test
     void whenInsertionSortByYearThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -73,6 +85,9 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: InsertionSort"));
     }
 
+    /**
+     * Проверяет, что сортировка по чётной мощности упорядочивает коллекцию.
+     */
     @Test
     void whenEvenPowerSortThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -94,6 +109,9 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: EvenPowerInsertionSort"));
     }
 
+    /**
+     * Проверяет, что при пустой коллекции выводится соответствующее сообщение.
+     */
     @Test
     void whenCollectionIsEmptyThenPrintsMessage() {
         CarArrayList cars = new CarArrayList();

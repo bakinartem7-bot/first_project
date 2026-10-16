@@ -7,11 +7,24 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 
+/**
+ * Заполняет коллекцию автомобилями со случайными характеристиками.
+ */
 public final class RandomFiller {
 
+    /**
+     * Создаёт заполнитель случайными данными.
+     */
     public RandomFiller() {
     }
 
+    /**
+     * Создаёт коллекцию из случайно сгенерированных автомобилей.
+     *
+     * @param size количество автомобилей
+     * @return заполненная коллекция автомобилей
+     * @throws IllegalArgumentException если размер не положителен или превышает предел
+     */
     public CarArrayList fill(int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("Размер массива должен быть больше нуля: " + size);
@@ -30,6 +43,11 @@ public final class RandomFiller {
 
     }
 
+    /**
+     * Генерирует один автомобиль со случайными мощностью, моделью и годом.
+     *
+     * @return случайный автомобиль
+     */
     private Car generateRandomCar () {
         int power = ThreadLocalRandom.current().nextInt(Limits.MIN_POWER, Limits.MAX_POWER + 1);
 

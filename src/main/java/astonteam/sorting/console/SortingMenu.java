@@ -12,7 +12,20 @@ import astonteam.sorting.stats.SortingStatistics;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Консольное меню сортировки: выбор алгоритма и поля сортировки, запуск сортировки и вывод статистики.
+ */
 public class SortingMenu {
+    /**
+     * Сортирует коллекцию автомобилей по выбранному пользователем полю и алгоритму,
+     * затем выводит статистику сортировки и результат.
+     *
+     * @param cars  сортируемая коллекция автомобилей
+     * @param input источник пользовательского ввода
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     * @throws IllegalArgumentException   если выбрано неизвестное поле или алгоритм сортировки
+     */
     public static void sortCars(CarArrayList cars, ConsoleInput input) {
         if (cars.size() == 0) {
             System.out.println("Сначала заполните коллекцию автомобилями.");

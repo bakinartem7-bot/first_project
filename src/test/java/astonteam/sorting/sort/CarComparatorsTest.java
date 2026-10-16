@@ -7,8 +7,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Тесты для компараторов {@link CarComparators}: проверка порядка сравнения
+ * по мощности, модели и году, а также обработки {@code null}.
+ */
 class CarComparatorsTest {
 
+    /**
+     * Создаёт автомобиль с указанными параметрами для использования в тестах.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year  год выпуска автомобиля
+     * @return собранный экземпляр {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder()
                 .power(power)
@@ -17,6 +29,10 @@ class CarComparatorsTest {
                 .build();
     }
 
+    /**
+     * Проверяет, что {@code BY_POWER} сравнивает автомобили только по мощности:
+     * меньшая мощность — меньший порядок, равная мощность — равенство.
+     */
     @Test
     void byPowerComparesOnlyPower() {
         Car weaker = car(100, "Toyota", 2020);
@@ -27,6 +43,10 @@ class CarComparatorsTest {
         assertEquals(0, CarComparators.BY_POWER.compare(weaker, samePower));
     }
 
+    /**
+     * Проверяет, что {@code BY_MODEL} сравнивает автомобили только по модели
+     * (лексикографически), игнорируя мощность и год.
+     */
     @Test
     void byModelComparesOnlyModel() {
         Car first = car(150, "Audi", 2020);
@@ -37,6 +57,10 @@ class CarComparatorsTest {
         assertEquals(0, CarComparators.BY_MODEL.compare(first, third));
     }
 
+    /**
+     * Проверяет, что {@code BY_YEAR} сравнивает автомобили только по году
+     * выпуска, игнорируя мощность и модель.
+     */
     @Test
     void byYearComparesOnlyYear() {
         Car older = car(150, "Toyota", 2000);
@@ -47,6 +71,10 @@ class CarComparatorsTest {
         assertEquals(0, CarComparators.BY_YEAR.compare(older, sameYear));
     }
 
+    /**
+     * Проверяет, что {@code BY_POWER} выбрасывает {@link NullPointerException}
+     * при сравнении с {@code null}.
+     */
     @Test
     void byPowerRejectsNull() {
         assertThrows(
@@ -55,6 +83,10 @@ class CarComparatorsTest {
         );
     }
 
+    /**
+     * Проверяет, что {@code BY_MODEL} выбрасывает {@link NullPointerException}
+     * при сравнении с {@code null}.
+     */
     @Test
     void byModelRejectsNull() {
         assertThrows(
@@ -63,6 +95,10 @@ class CarComparatorsTest {
         );
     }
 
+    /**
+     * Проверяет, что {@code BY_YEAR} выбрасывает {@link NullPointerException}
+     * при сравнении с {@code null}.
+     */
     @Test
     void byYearRejectsNull() {
         assertThrows(

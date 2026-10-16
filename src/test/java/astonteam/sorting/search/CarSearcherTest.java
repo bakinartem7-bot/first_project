@@ -7,11 +7,28 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Тесты для {@link CarSearcher}: поиск автомобилей по отдельным полям и по целому объекту.
+ */
 class CarSearcherTest {
 
+    /**
+     * Коллекция автомобилей, наполняемая перед каждым тестом.
+     */
     private CarArrayList cars;
+    /**
+     * Тестируемый поисковик автомобилей.
+     */
     private CarSearcher searcher;
 
+    /**
+     * Создаёт тестовый автомобиль с указанными параметрами.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year год выпуска автомобиля
+     * @return построенный объект {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder()
                 .power(power)
@@ -20,6 +37,9 @@ class CarSearcherTest {
                 .build();
     }
 
+    /**
+     * Подготавливает перед каждым тестом поисковик и коллекцию машин.
+     */
     @BeforeEach
     void setUp() {
         cars = new CarArrayList();
@@ -33,6 +53,9 @@ class CarSearcherTest {
         cars.add(car(100, "Bmw", 2022));
     }
 
+    /**
+     * Проверяет, что поиск по мощности возвращает все совпадения.
+     */
     @Test
     void whenSearchingByPowerReturnsAllMatches() {
         CarArrayList foundCars = searcher.findByPower(cars, 100);
@@ -41,6 +64,9 @@ class CarSearcherTest {
         assertEquals(100, foundCars.get(1).getPower());
     }
 
+    /**
+     * Проверяет, что поиск по модели игнорирует регистр и возвращает все совпадения.
+     */
     @Test
     void whenSearchingByModelIgnoresCaseAndReturnsAllMatches() {
         CarArrayList foundCars = searcher.findByModel(cars, "TOYOTA");
@@ -50,6 +76,9 @@ class CarSearcherTest {
         assertEquals("toyota", foundCars.get(1).getModel());
     }
 
+    /**
+     * Проверяет, что поиск по году возвращает все совпадения.
+     */
     @Test
     void whenSearchingByYearReturnsAllMatches() {
         CarArrayList foundCars = searcher.findByYear(cars, 2022);
@@ -58,6 +87,9 @@ class CarSearcherTest {
         assertEquals(2022, foundCars.get(1).getYear());
     }
 
+    /**
+     * Проверяет, что при поиске по целому автомобилю должны совпасть все поля.
+     */
     @Test
     void whenSearchingByWholeCarThenAllFieldsMustMatch() {
         Car target = car(150, "TOYOTA", 2021);
@@ -73,6 +105,9 @@ class CarSearcherTest {
         assertEquals(2021, foundCars.get(0).getYear());
     }
 
+    /**
+     * Проверяет, что поиск несуществующего автомобиля возвращает пустую коллекцию.
+     */
     @Test
     void whenSearchingForNonExistingCarThenReturnsEmptyCollection() {
         Car target = car(999, "TOYOTA", 2021);
@@ -81,6 +116,9 @@ class CarSearcherTest {
         assertEquals(0, foundCars.size());
     }
 
+    /**
+     * Проверяет, что поиск по пустой коллекции возвращает пустую коллекцию.
+     */
     @Test
     void whenSearchingEmptyCollectionThenReturnsEmptyCollection() {
         CarArrayList emptyCars = new CarArrayList();

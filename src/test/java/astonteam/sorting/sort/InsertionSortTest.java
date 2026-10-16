@@ -9,9 +9,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Тесты для алгоритма {@link InsertionSort}: проверка сортировки
+ * по разным полям, крайних случаев и обработки ошибок.
+ */
 class InsertionSortTest {
+    /**
+     * Коллекция автомобилей, наполняемая в {@link #setUp()}.
+     */
     private CarArrayList cars;
 
+    /**
+     * Создаёт автомобиль с указанными параметрами для использования в тестах.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year  год выпуска автомобиля
+     * @return собранный экземпляр {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder()
                 .power(power)
@@ -20,6 +35,10 @@ class InsertionSortTest {
                 .build();
     }
 
+    /**
+     * Подготавливает коллекцию из 100 автомобилей с возрастающей мощностью,
+     * моделями «Model0»..«Model99» и годами 2000..2026.
+     */
     @BeforeEach
     void setUp() {
         cars = new CarArrayList();
@@ -30,6 +49,10 @@ class InsertionSortTest {
         }
     }
 
+    /**
+     * Проверяет, что после сортировки по мощности коллекция упорядочена
+     * по неубыванию поля {@code power}.
+     */
     @Test
     void whenSortingByPowerThenCollectionIsSorted() {
         new InsertionSort("power").sort(cars, CarComparators.BY_POWER);
@@ -41,6 +64,10 @@ class InsertionSortTest {
         }
     }
 
+    /**
+     * Проверяет, что после сортировки по году коллекция упорядочена
+     * по неубыванию поля {@code year}.
+     */
     @Test
     void whenSortingByYearThenCollectionIsSorted() {
         new InsertionSort("year").sort(cars, CarComparators.BY_YEAR);
@@ -53,6 +80,10 @@ class InsertionSortTest {
     }
 
 
+    /**
+     * Проверяет, что после сортировки по модели коллекция упорядочена
+     * лексикографически по полю {@code model}.
+     */
     @Test
     void whenSortingByModelThenCollectionIsSorted() {
         new InsertionSort("model").sort(cars, CarComparators.BY_MODEL);
@@ -64,6 +95,10 @@ class InsertionSortTest {
         }
     }
 
+    /**
+     * Проверяет, что сортировка пустой коллекции не выбрасывает исключений
+     * и оставляет её пустой.
+     */
     @Test
     void whenSortingEmptyCollectionThenNoException() {
         CarArrayList emptyCars = new CarArrayList();
@@ -72,6 +107,10 @@ class InsertionSortTest {
                 "Пустая коллекция должна оставаться пустой после сортировки");
     }
 
+    /**
+     * Проверяет, что сортировка коллекции из одного элемента не нарушает
+     * ни сам элемент, ни размер коллекции.
+     */
     @Test
     void whenSortingSingleElementCollectionThenNoException() {
         CarArrayList singleCar = new CarArrayList();
@@ -87,6 +126,10 @@ class InsertionSortTest {
                 "Коллекция с одним элементом должна оставаться неизменной после сортировки");
     }
 
+    /**
+     * Проверяет, что повторная сортировка уже отсортированной коллекции
+     * не ломает порядок элементов.
+     */
     @Test
     void whenSortingAlreadySortedCollectionThenNoException() {
         new InsertionSort("power").sort(cars, CarComparators.BY_POWER);
@@ -99,6 +142,10 @@ class InsertionSortTest {
         }
     }
 
+    /**
+     * Проверяет корректность сортировки при наличии дубликатов
+     * по мощности в коллекции.
+     */
     @Test
     void whenCollectionHasDuplicatesThenSortedCorrectly() {
         cars.add(car(150, "Model50", 2025));
@@ -112,6 +159,10 @@ class InsertionSortTest {
         }
     }
 
+    /**
+     * Проверяет, что обратный порядок элементов после сортировки
+     * становится неубывающим по мощности.
+     */
     @Test
     void whenSortingReverseOrderedCollectionThenItBecomesSorted() {
         CarArrayList testCars = new CarArrayList();
@@ -125,6 +176,10 @@ class InsertionSortTest {
         assertEquals(300, testCars.get(2).getPower());
     }
 
+    /**
+     * Проверяет стабильность сортировки: автомобили с равной мощностью
+     * сохраняют исходный относительный порядок.
+     */
     @Test
     void whenEqualPowerThenOriginalOrderIsPreserved() {
         Car first = car(150, "First", 2020);
@@ -137,6 +192,10 @@ class InsertionSortTest {
         assertEquals("Second", testCars.get(1).getModel());
     }
 
+    /**
+     * Проверяет, что сортировка с {@code null}-компаратором выбрасывает
+     * {@link NullPointerException} с сообщением «comparator».
+     */
     @Test
     void whenNullComparatorThenThrowsException() {
         NullPointerException exception = assertThrows(
@@ -146,6 +205,10 @@ class InsertionSortTest {
         assertEquals("comparator", exception.getMessage());
     }
 
+    /**
+     * Проверяет, что сортировка {@code null}-коллекции выбрасывает
+     * {@link NullPointerException} с сообщением «cars».
+     */
     @Test
     void whenNullCollectionThenThrowsException() {
         NullPointerException exception = assertThrows(
