@@ -2,9 +2,20 @@ package astonteam.sorting.validation;
 
 import  astonteam.sorting.common.Limits;
 
+/**
+ * Валидатор полей автомобиля.
+ */
 public final class CarValidator {
 
 
+    /**
+     * Проверяет мощность, модель и год автомобиля.
+     *
+     * @param power мощность двигателя
+     * @param model название модели
+     * @param year  год выпуска
+     * @return результат валидации
+     */
     public ValidationResult validate(int power, String model, int year) {
         if (power < 0) {
             return ValidationResult.error("мощность не может быть отрицательной");

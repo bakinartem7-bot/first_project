@@ -11,9 +11,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+/**
+ * Тесты для алгоритма {@link MergeSort}: проверка сортировки по разным
+ * полям, крайних случаев, стабильности и возвращаемой статистики.
+ */
 class MergeSortTest {
+    /**
+     * Коллекция автомобилей, наполняемая в {@link #setUp()}.
+     */
     private CarArrayList cars;
 
+    /**
+     * Создаёт автомобиль с указанными параметрами для использования в тестах.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year  год выпуска автомобиля
+     * @return собранный экземпляр {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder()
                 .power(power)
@@ -22,6 +37,10 @@ class MergeSortTest {
                 .build();
     }
 
+    /**
+     * Подготавливает коллекцию из 100 автомобилей с возрастающей мощностью,
+     * моделями «Model0»..«Model99» и годами 2000..2026.
+     */
     @BeforeEach
     void setUp() {
         cars = new CarArrayList();
@@ -30,6 +49,10 @@ class MergeSortTest {
         }
     }
 
+    /**
+     * Проверяет, что после сортировки по мощности коллекция упорядочена
+     * по неубыванию поля {@code power}.
+     */
     @Test
     void whenSortingByPowerThenCollectionIsSorted() {
         new MergeSort("power").sort(cars, CarComparators.BY_POWER);
@@ -41,6 +64,10 @@ class MergeSortTest {
         }
     }
 
+    /**
+     * Проверяет, что после сортировки по году коллекция упорядочена
+     * по неубыванию поля {@code year}.
+     */
     @Test
     void whenSortingByYearThenCollectionIsSorted() {
         new MergeSort("year").sort(cars, CarComparators.BY_YEAR);
@@ -52,6 +79,10 @@ class MergeSortTest {
         }
     }
 
+    /**
+     * Проверяет, что после сортировки по модели коллекция упорядочена
+     * лексикографически по полю {@code model}.
+     */
     @Test
     void whenSortingByModelThenCollectionIsSorted() {
         new MergeSort("model").sort(cars, CarComparators.BY_MODEL);
@@ -63,6 +94,10 @@ class MergeSortTest {
         }
     }
 
+    /**
+     * Проверяет, что сортировка пустой коллекции не выбрасывает исключений
+     * и оставляет её пустой.
+     */
     @Test
     void whenSortingEmptyCollectionThenNoException() {
         CarArrayList emptyCars = new CarArrayList();
@@ -70,6 +105,10 @@ class MergeSortTest {
         assertEquals(0, emptyCars.size(), "Пустая коллекция должна оставаться пустой после сортировки");
     }
 
+    /**
+     * Проверяет, что неотсортированная коллекция после сортировки
+     * становится упорядоченной по мощности.
+     */
     @Test
     void whenSortingUnsortedCollectionThenItBecomesSorted() {
         CarArrayList testCars = new CarArrayList();
@@ -82,6 +121,10 @@ class MergeSortTest {
         assertEquals(300, testCars.get(2).getPower());
     }
 
+    /**
+     * Проверяет, что сортировка коллекции из одного элемента не нарушает
+     * ни сам элемент, ни размер коллекции.
+     */
     @Test
     void whenSortingSingleElementCollectionThenNoException() {
         CarArrayList singleCar = new CarArrayList();
@@ -97,6 +140,10 @@ class MergeSortTest {
                 "Коллекция с одним элементом должна оставаться неизменной после сортировки");
     }
 
+    /**
+     * Проверяет, что повторная сортировка уже отсортированной коллекции
+     * не ломает порядок элементов.
+     */
     @Test
     void whenSortingAlreadySortedCollectionThenNoException() {
         new MergeSort("power").sort(cars, CarComparators.BY_POWER);
@@ -109,6 +156,10 @@ class MergeSortTest {
         }
     }
 
+    /**
+     * Проверяет корректность сортировки при наличии дубликатов
+     * по мощности в коллекции.
+     */
     @Test
     void whenCollectionHasDuplicatesThenSortedCorrectly() {
         cars.add(car(150, "Model50", 2025));
@@ -122,6 +173,10 @@ class MergeSortTest {
         }
     }
 
+    /**
+     * Проверяет, что обратный порядок элементов после сортировки
+     * становится неубывающим по мощности.
+     */
     @Test
     void whenSortingReverseOrderedCollectionThenItBecomesSorted() {
         CarArrayList testCars = new CarArrayList();
@@ -135,6 +190,10 @@ class MergeSortTest {
         assertEquals(300, testCars.get(2).getPower());
     }
 
+    /**
+     * Проверяет стабильность сортировки: автомобили с равной мощностью
+     * сохраняют исходный относительный порядок.
+     */
     @Test
     void whenEqualPowerThenOriginalOrderIsPreserved() {
         Car first = car(150, "First", 2020);
@@ -153,6 +212,10 @@ class MergeSortTest {
         assertEquals("Fourth", testCars.get(3).getModel());
     }
 
+    /**
+     * Проверяет, что сортировка с {@code null}-компаратором выбрасывает
+     * {@link NullPointerException} с сообщением «comparator».
+     */
     @Test
     void whenNullComparatorThenThrowsException() {
         NullPointerException exception = assertThrows(
@@ -162,6 +225,10 @@ class MergeSortTest {
         assertEquals("comparator", exception.getMessage());
     }
 
+    /**
+     * Проверяет, что сортировка {@code null}-коллекции выбрасывает
+     * {@link NullPointerException} с сообщением «cars».
+     */
     @Test
     void whenNullCollectionThenThrowsException() {
         NullPointerException exception = assertThrows(
@@ -172,6 +239,11 @@ class MergeSortTest {
         assertEquals("cars", exception.getMessage());
     }
 
+    /**
+     * Проверяет, что метод сортировки возвращает статистику с корректными
+     * именем алгоритма, полем сортировки, размером, числом сравнений/обменов
+     * и неотрицательной продолжительностью.
+     */
     @Test
     void whenSortingThenStatisticsAreReturned() {
         cars.add(car(300,"BMW", 2001));

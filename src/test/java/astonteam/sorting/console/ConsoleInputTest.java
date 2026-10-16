@@ -10,8 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Тесты для {@link ConsoleInput}: чтение и нормализация строк, чисел, ответов да/нет и работа с ошибками.
+ */
 class ConsoleInputTest {
 
+    /**
+     * Проверяет, что прочитанная строка нормализуется и обрезается по краям.
+     */
     @Test
     void readLineNormalizesAndTrims() {
         TestSupport.Outcome outcome = TestSupport.run("  hello world \n", () -> {
@@ -22,6 +28,9 @@ class ConsoleInputTest {
         assertNull(outcome.error());
     }
 
+    /**
+     * Проверяет, что слишком длинная строка отклоняется с сообщением и принимается следующая.
+     */
     @Test
     void readLineReportsTooLongLineThenAcceptsNext() {
         String tooLong = "a".repeat(Limits.MAX_LINE_LENGTH + 10);
@@ -34,6 +43,9 @@ class ConsoleInputTest {
         assertTrue(outcome.output().contains("Строка длиннее"));
     }
 
+    /**
+     * Проверяет, что чтение непустой строки пропускает пустые и пробельные строки.
+     */
     @Test
     void readNonBlankSkipsEmptyLines() {
         TestSupport.run("\n   \nvalue\n", () -> {
@@ -43,6 +55,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что корректное число разбирается из ввода.
+     */
     @Test
     void readIntParsesValidNumber() {
         TestSupport.run("42\n", () -> {
@@ -52,6 +67,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что нечисловое значение отклоняется с сообщением и принимается следующий ввод.
+     */
     @Test
     void readIntRejectsNonNumberThenAcceptsNext() {
         TestSupport.Outcome outcome = TestSupport.run("abc\n7\n", () -> {
@@ -62,6 +80,9 @@ class ConsoleInputTest {
         assertTrue(outcome.output().contains("не является целым числом"));
     }
 
+    /**
+     * Проверяет, что число вне заданного диапазона отклоняется и принимается корректное значение.
+     */
     @Test
     void readIntRangeRejectsOutOfRange() {
         TestSupport.run("0\n11\n5\n", () -> {
@@ -71,6 +92,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что некорректные границы диапазона приводят к IllegalArgumentException.
+     */
     @Test
     void readIntRangeRejectsInvalidBounds() {
         TestSupport.run("", () -> {
@@ -80,6 +104,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что ответы да/нет принимаются как на русском, так и на английском.
+     */
     @Test
     void readYesNoAcceptsRussianAndEnglish() {
         TestSupport.run("да\nno\nd\n", () -> {
@@ -91,6 +118,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что неожиданный ответ отклоняется с сообщением и принимается следующий.
+     */
     @Test
     void readYesNoRejectsUnexpectedAnswer() {
         TestSupport.Outcome outcome = TestSupport.run("maybe\nнет\n", () -> {
@@ -101,6 +131,9 @@ class ConsoleInputTest {
         assertTrue(outcome.output().contains("Ожидается ответ"));
     }
 
+    /**
+     * Проверяет, что после превышения максимального числа попыток бросается AttemptsExceededException.
+     */
     @Test
     void reportErrorThrowsAfterMaxAttempts() {
         TestSupport.run("", () -> {
@@ -114,6 +147,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что успешный ввод сбрасывает счётчик неудачных попыток.
+     */
     @Test
     void markSuccessResetsFailedCounter() {
         TestSupport.run("a\na\na\na\n7\n", () -> {
@@ -123,6 +159,9 @@ class ConsoleInputTest {
         });
     }
 
+    /**
+     * Проверяет, что при окончании потока ввода бросается EndOfInputException.
+     */
     @Test
     void endOfInputThrowsEndOfInputException() {
         TestSupport.run("", () -> {

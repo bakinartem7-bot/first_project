@@ -6,7 +6,20 @@ import astonteam.sorting.search.CarSearcher;
 
 import java.util.List;
 
+/**
+ * Консольное меню поиска: выбор критерия поиска автомобилей и вывод найденных совпадений.
+ */
 public class SearchMenu {
+    /**
+     * Запрашивает у пользователя критерий поиска, выполняет поиск автомобилей
+     * и выводит найденные совпадения.
+     *
+     * @param cars  коллекция, в которой выполняется поиск
+     * @param input источник пользовательского ввода
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     * @throws IllegalArgumentException   если выбран неизвестный вариант поиска
+     */
     public static void searchCars(CarArrayList cars, ConsoleInput input) {
         if (cars.size() == 0) {
             System.out.println("Сначала заполните коллекцию автомобилями.");
@@ -61,6 +74,11 @@ public class SearchMenu {
         printResults(foundCars);
     }
 
+    /**
+     * Выводит найденные автомобили либо сообщение об отсутствии совпадений.
+     *
+     * @param foundCars результаты поиска
+     */
     private static void printResults(CarArrayList foundCars) {
         if (foundCars.size() == 0) {
             System.out.println("Совпадений не найдено.");

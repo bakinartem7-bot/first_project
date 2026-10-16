@@ -6,6 +6,16 @@ import astonteam.sorting.common.TextSanitizer;
 import java.time.Duration;
 import java.util.Objects;
 
+/**
+ * Статистика выполнения сортировки.
+ *
+ * @param algorithmName название алгоритма сортировки
+ * @param sortField     поле, по которому выполнялась сортировка
+ * @param size          количество элементов
+ * @param comparisons   количество сравнений
+ * @param swaps         количество перестановок
+ * @param duration      длительность выполнения
+ */
 public record SortingStatistics(
         String algorithmName,
         String sortField,
@@ -14,6 +24,12 @@ public record SortingStatistics(
         long swaps,
         Duration duration) {
 
+    /**
+     * Компактный конструктор, выполняющий нормализацию и проверку полей.
+     *
+     * @throws NullPointerException     если {@code duration} равен {@code null}
+     * @throws IllegalArgumentException если данные не проходят проверки
+     */
     public SortingStatistics {
         algorithmName = TextSanitizer.requireText(algorithmName, "algorithmName", Limits.MAX_TEXT_LENGTH);
         sortField = TextSanitizer.requireText(sortField, "sortField", Limits.MAX_TEXT_LENGTH);
@@ -29,6 +45,11 @@ public record SortingStatistics(
         }
     }
 
+    /**
+     * Возвращает длительность в миллисекундах.
+     *
+     * @return длительность в миллисекундах
+     */
     public double durationMillis() {
         return duration.toNanos() / 1_000_000.0;
     }

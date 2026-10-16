@@ -5,14 +5,29 @@ import astonteam.sorting.model.Car;
 
 import java.util.Objects;
 
+/**
+ * Преобразует автомобиль в строку и обратно в формате «мощность;модель;год».
+ */
 public final class CarLineFormat {
 
+    /** Разделитель полей в строке. */
     public static final String DELIMITER = ";";
+    /** Шаблон-подсказка формата строки. */
     public static final String PATTERN = "мощность" + DELIMITER + "модель" + DELIMITER + "год";
 
+    /**
+     * Утилитный конструктор, не предназначен для вызова.
+     */
     private CarLineFormat() {
     }
 
+    /**
+     * Формирует строку представления автомобиля.
+     *
+     * @param car автомобиль для форматирования
+     * @return строка в формате «мощность;модель;год»
+     * @throws IllegalArgumentException если модель пуста или содержит недопустимые символы
+     */
     public static String format(Car car) {
         Objects.requireNonNull(car, "car");
         String model = car.getModel();
@@ -26,6 +41,13 @@ public final class CarLineFormat {
     }
 
 
+    /**
+     * Разбирает строку и создаёт автомобиль.
+     *
+     * @param line строка в формате «мощность;модель;год»
+     * @return созданный автомобиль
+     * @throws IllegalArgumentException если строка пуста или содержит некорректные данные
+     */
     public static  Car parse(String line) {
         Objects.requireNonNull(line, "line");
         String trimmed = line.trim();

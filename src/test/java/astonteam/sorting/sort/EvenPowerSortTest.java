@@ -10,9 +10,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+/**
+ * Тесты для алгоритма {@link EvenPowerSort}: проверка сортировки только
+ * автомобилей с чётной мощностью и сохранности остальных элементов.
+ */
 class EvenPowerSortTest {
+    /**
+     * Коллекция автомобилей, наполняемая в {@link #setUp()}.
+     */
     private CarArrayList cars;
 
+    /**
+     * Создаёт автомобиль с указанными параметрами для использования в тестах.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year  год выпуска автомобиля
+     * @return собранный экземпляр {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder()
                 .power(power)
@@ -21,6 +36,10 @@ class EvenPowerSortTest {
                 .build();
     }
 
+    /**
+     * Подготавливает коллекцию из 100 автомобилей с возрастающей мощностью,
+     * моделями «Model0»..«Model99» и годами 2000..2026.
+     */
     @BeforeEach
     void setUp() {
         cars = new CarArrayList();
@@ -31,6 +50,10 @@ class EvenPowerSortTest {
         }
     }
 
+    /**
+     * Проверяет, что при сортировке автомобили с чётной мощностью
+     * перемещаются на свои позиции, а с нечётной — остаются на своих местах.
+     */
     @Test
     void whenSortingThenOddPowerCarsStayAtTheirPositions() {
         CarArrayList testCars = new CarArrayList();
@@ -49,6 +72,10 @@ class EvenPowerSortTest {
         assertEquals(300, testCars.get(4).getPower());
     }
 
+    /**
+     * Проверяет, что сортировка пустой коллекции не выбрасывает исключений
+     * и оставляет её пустой.
+     */
     @Test
     void whenSortingEmptyCollectionThenNoException() {
         CarArrayList emptyCars = new CarArrayList();
@@ -57,6 +84,10 @@ class EvenPowerSortTest {
                 "Пустая коллекция должна оставаться пустой после сортировки");
     }
 
+    /**
+     * Проверяет, что сортировка коллекции из одного элемента не нарушает
+     * ни сам элемент, ни размер коллекции.
+     */
     @Test
     void whenSortingSingleElementCollectionThenNoException() {
         CarArrayList singleCar = new CarArrayList();
@@ -72,6 +103,10 @@ class EvenPowerSortTest {
                 "Коллекция с одним элементом должна оставаться неизменной после сортировки");
     }
 
+    /**
+     * Проверяет, что на уже отсортированной коллекции чётные элементы
+     * остаются упорядоченными, а нечётные — на исходных позициях.
+     */
     @Test
     void whenSortingAlreadySortedCollectionThenEvenCarsStaySortedAndOddCarsStayInPlace() {
         Car oddCarAtIndex1 = cars.get(1);
@@ -91,6 +126,10 @@ class EvenPowerSortTest {
         assertSame(oddCarAtIndex3, cars.get(3));
     }
 
+    /**
+     * Проверяет, что обратный порядок элементов после сортировки
+     * становится неубывающим по мощности.
+     */
     @Test
     void whenSortingReverseOrderedCollectionThenItBecomesSorted() {
         CarArrayList testCars = new CarArrayList();
@@ -104,6 +143,10 @@ class EvenPowerSortTest {
         assertEquals(300, testCars.get(2).getPower());
     }
 
+    /**
+     * Проверяет стабильность сортировки: автомобили с равной чётной
+     * мощностью сохраняют исходный относительный порядок.
+     */
     @Test
     void whenEvenCarsHaveEqualPowerThenTheirOriginalOrderIsPreserved() {
         CarArrayList testCars = new CarArrayList();
@@ -118,6 +161,10 @@ class EvenPowerSortTest {
         assertEquals("Second", testCars.get(2).getModel());
     }
 
+    /**
+     * Проверяет, что при отсутствии автомобилей с чётной мощностью
+     * коллекция остаётся полностью неизменной.
+     */
     @Test
     void whenThereAreNoEvenPowerCarsThenCollectionStaysUnchanged() {
         CarArrayList testCars = new CarArrayList();
@@ -133,6 +180,10 @@ class EvenPowerSortTest {
         assertSame(second, testCars.get(1));
     }
 
+    /**
+     * Проверяет, что сортировка с {@code null}-компаратором выбрасывает
+     * {@link NullPointerException} с сообщением «comparator».
+     */
     @Test
     void whenNullComparatorThenThrowsException() {
         NullPointerException exception = assertThrows(
@@ -142,6 +193,10 @@ class EvenPowerSortTest {
         assertEquals("comparator", exception.getMessage());
     }
 
+    /**
+     * Проверяет, что сортировка {@code null}-коллекции выбрасывает
+     * {@link NullPointerException} с сообщением «cars».
+     */
     @Test
     void whenNullCollectionThenThrowsException() {
         NullPointerException exception = assertThrows(

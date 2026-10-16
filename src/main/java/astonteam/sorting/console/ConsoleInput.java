@@ -10,13 +10,27 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
+/**
+ * Чтение пользовательского ввода из консоли с проверкой длины, формата и лимита ошибок.
+ * Реализует {@link AutoCloseable} для освобождения потока чтения.
+ */
 public final class ConsoleInput implements AutoCloseable {
 
+    /** Поток чтения символов из стандартного ввода. */
     private final BufferedReader reader =
             new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
+    /** Счётчик подряд идущих неудачных попыток ввода. */
     private int failedAttempts;
 
+    /**
+     * Читает строку из консоли, отклоняя строки длиннее допустимого предела.
+     *
+     * @param prompt приглашение к вводу
+     * @return нормализованная (без краевых пробелов) строка
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     */
     public String readLine(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -29,6 +43,14 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /**
+     * Читает строку, повторяя запрос до тех пор, пока ввод не окажется непустым.
+     *
+     * @param prompt приглашение к вводу
+     * @return непустая нормализованная строка
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     */
     public String readNonBlank(String prompt) {
         while (true) {
             String line = readLine(prompt);
@@ -40,6 +62,14 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /**
+     * Читает целое число из консоли, повторяя запрос при некорректном вводе.
+     *
+     * @param prompt приглашение к вводу
+     * @return введённое целое число
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     */
     public int readInt(String prompt) {
         while (true) {
             String line = readLine(prompt);
@@ -55,6 +85,17 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /**
+     * Читает целое число из консоли, гарантируя попадание в заданный диапазон.
+     *
+     * @param prompt приглашение к вводу
+     * @param min    нижняя граница диапазона (включительно)
+     * @param max    верхняя граница диапазона (включительно)
+     * @return введённое число из диапазона [min, max]
+     * @throws IllegalArgumentException если {@code min} больше {@code max}
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     */
     public int readInt(String prompt, int min, int max) {
         if (min > max) {
             throw new IllegalArgumentException("min больше max: " + min + " > " + max);
@@ -69,6 +110,14 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /**
+     * Запрашивает положительный или отрицательный ответ («да»/«нет»).
+     *
+     * @param prompt приглашение к вводу
+     * @return {@code true} для утвердительного ответа, {@code false} для отрицательного
+     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
+     * @throws EndOfInputException       если поток ввода завершён
+     */
     public boolean readYesNo(String prompt) {
         while (true) {
             String line = readLine(prompt + " (да/нет): ").toLowerCase(Locale.ROOT);
@@ -86,6 +135,12 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /**
+     * Выводит сообщение об ошибке ввода и увеличивает счётчик неудачных попыток.
+     *
+     * @param message текст сообщения об ошибке
+     * @throws AttemptsExceededException если после этого сообщения достигнут предел попыток
+     */
     public void reportError(String message) {
         System.out.println(message);
         failedAttempts++;
@@ -95,10 +150,12 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /** Сбрасывает счётчик неудачных попыток после успешного ввода. */
     public void markSuccess() {
         failedAttempts = 0;
     }
 
+    /** Закрывает поток чтения из консоли; ошибки закрытия игнорируются. */
     @Override
     public void close() {
         try {
@@ -108,6 +165,13 @@ public final class ConsoleInput implements AutoCloseable {
         }
     }
 
+    /**
+     * Считывает одну строку, ограниченную по длине, без блокирующего ожидания завершения потока.
+     *
+     * @return прочитанная строка вместе с признаком превышения максимальной длины
+     * @throws EndOfInputException       если поток ввода завершён на пустой строке
+     * @throws UncheckedIOException      при ошибке чтения из консоли
+     */
     private Line readBoundedLine() {
         StringBuilder builder = new StringBuilder();
         boolean anyChars = false;
@@ -137,6 +201,12 @@ public final class ConsoleInput implements AutoCloseable {
         return new Line(builder.toString(), truncated);
     }
 
+    /**
+     * Результат чтения строки: её содержимое и признак обрезания по максимальной длине.
+     *
+     * @param value     прочитанные символы
+     * @param truncated {@code true}, если строка превысила допустимую длину
+     */
     private record Line(String value, boolean truncated) {
     }
 }
