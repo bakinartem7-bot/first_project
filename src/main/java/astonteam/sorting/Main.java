@@ -15,6 +15,8 @@ import astonteam.sorting.validation.CarValidator;
 
 import java.io.UncheckedIOException;
 import java.util.List;
+import  java.nio.file.Path;
+import astonteam.sorting.fill.FileFiller;
 
 public class Main {
 
@@ -28,9 +30,10 @@ public class Main {
             Menu menu = new Menu("Главное меню", List.of(
                     new MenuItem(1, "Заполнить массив вручную"),
                     new MenuItem(2, "Заполнить массив случайно"),
-                    new MenuItem(3, "Сортировать коллекцию"),
-                    new MenuItem(4, "Сохранить коллекцию в файл"),
-                    new MenuItem(5, "Выход")
+                    new MenuItem(3, "Заполнить массив из файла"),
+                    new MenuItem(4, "Сортировать коллекцию"),
+                    new MenuItem(5, "Сохранить коллекцию в файл"),
+                    new MenuItem(6, "Выход")
             ));
             boolean running = true;
             while (running) {
@@ -46,9 +49,15 @@ public class Main {
                             cars = randomFiller.fill(size);
                             System.out.println("Автомобилей сгенерировано: " + cars.size());
                         }
-                        case 3 -> SortingMenu.sortCars(cars, input);
-                        case 4 -> saver.saveCollection("cars.txt", cars);
-                        case 5 -> running = false;
+                        case  3 -> {
+                            String fileName = input.readNonBlank("Введите путь к файлу (например, cars.txt): ");
+                            Path path = Path.of(fileName);
+                            cars = new FileFiller().fill(path);
+                            System.out.println("Автомобилей загружено: " + cars.size());
+                        }
+                        case 4 -> SortingMenu.sortCars(cars, input);
+                        case 5 -> saver.saveCollection("cars.txt", cars);
+                        case 6 -> running = false;
                         default -> System.out.println("Пункт в работе.");
                     }
                 } catch (AttemptsExceededException | IllegalArgumentException | UncheckedIOException e) {

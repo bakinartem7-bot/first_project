@@ -24,4 +24,48 @@ public final class CarLineFormat {
         }
         return car.getPower() + DELIMITER + model + DELIMITER + car.getYear();
     }
+
+
+    public static  Car parse(String line) {
+        Objects.requireNonNull(line, "line");
+        String trimmed = line.trim();
+        if (trimmed.isEmpty()) {
+            throw new IllegalArgumentException("Строка не должна быть пустой");
+        }
+        String[] parts = trimmed.split(DELIMITER);
+
+        if (parts.length > 3) {
+            throw new IllegalArgumentException("Модель содержит недопустимый символ-разделитель '" + DELIMITER + "'");
+        }
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Недостаточно данных. Ожидается 3 поля, разделенные '" + DELIMITER + "'");
+        }
+
+        int power;
+        int year;
+
+        try {
+            power = Integer.parseInt(parts[0].trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Мощность должна быть целым числом: '" + parts[0] + "'");
+        }
+
+        String model = parts[1].trim();
+        if (model.isEmpty()) {
+            throw new IllegalArgumentException("Модель не должна быть пустой");
+        }
+
+        try {
+            year = Integer.parseInt(parts[2].trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Год должен быть целым числом: '" + parts[2] + "'");
+        }
+
+        return Car.builder()
+                .power(power)
+                .model(model)
+                .year(year)
+                .build();
+
+    }
 }

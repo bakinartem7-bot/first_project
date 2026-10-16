@@ -1,0 +1,59 @@
+package astonteam.sorting.fill;
+
+import astonteam.sorting.collection.CarArrayList;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class FileFillerTest {
+
+    @TempDir
+    Path tempDir;
+
+    @Test
+    void fillReadsValidFile() throws IOException {
+        Path file = tempDir.resolve("valid.txt");
+        Files.writeString(file, "150;Toyota;2015\n200;BMW;2020\n");
+
+        CarArrayList cars = new FileFiller().fill(file);
+
+        assertEquals(2, cars.size());
+        assertEquals(150, cars.get(0).getPower());
+        assertEquals("Toyota", cars.get(0).getModel());
+        assertEquals(2020, cars.get(1).getYear());
+    }
+
+    @Test
+    void fillIgnoresEmptyLines() throws IOException {
+        Path file = tempDir.resolve("empty_lines.txt");
+        Files.writeString(file, "150;Toyota;2015\n\n\n200;BMW;2020\n");
+
+        CarArrayList cars = new FileFiller().fill(file);
+
+        assertEquals(2, cars.size());
+    }
+
+    @Test
+    void fillRejectsNonExistentFile() {
+        Path file = tempDir.resolve("nonexistent.txt");
+        assertThrows(IllegalArgumentException.class, () -> new FileFiller().fill(file));
+    }
+
+    @Test
+    void fillRejectsInvalidFileContent() throws IOException {
+        Path file = tempDir.resolve("invalid.txt");
+        Files.writeString(file, "150;Toyota;2015\ninvalid_line\n200;BMW;2020\n");
+
+        assertThrows(IllegalArgumentException.class, () -> new FileFiller().fill(file));
+    }
+
+    @Test
+    void fillRejectsNullPath() {
+        assertThrows(NullPointerException.class, () -> new FileFiller().fill(null));
+    }
+}

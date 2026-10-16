@@ -47,4 +47,56 @@ class CarLineFormatTest {
         constructor.setAccessible(true);
         assertNotNull(constructor.newInstance());
     }
+
+    @Test
+    void parseValidLine() {
+        Car car = CarLineFormat.parse("150;Toyota;2015");
+        assertEquals(150, car.getPower());
+        assertEquals("Toyota", car.getModel());
+        assertEquals(2015, car.getYear());
+    }
+
+    @Test
+    void parseRejectsNull() {
+        assertThrows(NullPointerException.class, () -> CarLineFormat.parse(null));
+    }
+
+    @Test
+    void parseRejectsEmptyOrBlank() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse(""));
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("   "));
+    }
+
+    @Test
+    void parseRejectsTooFewParts() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("150;Toyota"));
+    }
+
+    @Test
+    void parseRejectsTooManyParts() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("150;Toyota;Corolla;2015"));
+    }
+
+    @Test
+    void parseRejectsInvalidPower() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("abc;Toyota;2015"));
+    }
+
+    @Test
+    void parseRejectsInvalidYear() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("150;Toyota;year"));
+    }
+
+    @Test
+    void parseRejectsEmptyModel() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("150;;2015"));
+    }
+
+    @Test
+    void parseRejectsOutOfBoundsPower() {
+        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("-10;Toyota;2015"));
+    }
+
+
+
 }
