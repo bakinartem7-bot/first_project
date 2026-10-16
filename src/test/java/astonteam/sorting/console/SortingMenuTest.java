@@ -74,6 +74,27 @@ class SortingMenuTest {
     }
 
     @Test
+    void whenEvenPowerSortThenCollectionIsSorted() {
+        CarArrayList cars = new CarArrayList();
+        cars.add(Car.builder().model("Toyota").power(150).year(2020).build());
+        cars.add(Car.builder().model("Toyota").power(100).year(2020).build());
+        cars.add(Car.builder().model("Toyota").power(101).year(2020).build());
+        TestSupport.Outcome outcome = TestSupport.run(
+                "3\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SortingMenu.sortCars(cars, input);
+                    }
+                }
+        );
+        assertNull(outcome.error());
+        assertEquals(100, cars.get(0).getPower());
+        assertEquals(150, cars.get(1).getPower());
+        assertEquals(101, cars.get(2).getPower());
+        assertTrue(outcome.output().contains("Алгоритм: EvenPowerInsertionSort"));
+    }
+
+    @Test
     void whenCollectionIsEmptyThenPrintsMessage() {
         CarArrayList cars = new CarArrayList();
         TestSupport.Outcome outcome = TestSupport.run(
