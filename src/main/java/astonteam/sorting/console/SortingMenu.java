@@ -3,6 +3,7 @@ package astonteam.sorting.console;
 import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.sort.CarComparators;
+import astonteam.sorting.sort.EvenPowerSort;
 import astonteam.sorting.sort.InsertionSort;
 import astonteam.sorting.sort.MergeSort;
 import astonteam.sorting.sort.SortStrategy;
@@ -18,44 +19,49 @@ public class SortingMenu {
             return;
         }
 
-        Menu algorithmMenu = new Menu("Выберите алгоритм сортировки", List.of(
-                new MenuItem(1, "Сортировка вставками"),
-                new MenuItem(2, "Сортировка слиянием")
-        ));
-        int algorithmId = algorithmMenu.ask(input).id();
-
-        Menu fieldMenu = new Menu("Выберите поле сортировки", List.of(
-                new MenuItem(1, "Мощность"),
-                new MenuItem(2, "Модель"),
-                new MenuItem(3, "Год выпуска")
-        ));
-
-        int fieldId = fieldMenu.ask(input).id();
-
         String sortField;
         Comparator<Car> comparator;
 
-        switch (fieldId) {
-            case 1 -> {
-                sortField = "power";
-                comparator = CarComparators.BY_POWER;
+        Menu algorithmMenu = new Menu("Выберите алгоритм сортировки", List.of(
+                new MenuItem(1, "Сортировка вставками"),
+                new MenuItem(2, "Сортировка слиянием"),
+                new MenuItem(3, "Сортировка автомобилей с чётной мощностью")
+        ));
+        int algorithmId = algorithmMenu.ask(input).id();
+
+        if (algorithmId == 3) {
+            sortField = "power";
+            comparator = CarComparators.BY_POWER;
+        } else {
+            Menu fieldMenu = new Menu("Выберите поле сортировки", List.of(
+                    new MenuItem(1, "Мощность"),
+                    new MenuItem(2, "Модель"),
+                    new MenuItem(3, "Год выпуска")
+            ));
+            int fieldId = fieldMenu.ask(input).id();
+            switch (fieldId) {
+                case 1 -> {
+                    sortField = "power";
+                    comparator = CarComparators.BY_POWER;
+                }
+                case 2 -> {
+                    sortField = "model";
+                    comparator = CarComparators.BY_MODEL;
+                }
+                case 3 -> {
+                    sortField = "year";
+                    comparator = CarComparators.BY_YEAR;
+                }
+                default -> throw new IllegalArgumentException(
+                        "Неизвестное поле сортировки: " + fieldId
+                );
             }
-            case 2 -> {
-                sortField = "model";
-                comparator = CarComparators.BY_MODEL;
-            }
-            case 3 -> {
-                sortField = "year";
-                comparator = CarComparators.BY_YEAR;
-            }
-            default -> throw new IllegalArgumentException(
-                    "Неизвестное поле сортировки: " + fieldId
-            );
         }
 
         SortStrategy strategy = switch (algorithmId) {
             case 1 -> new InsertionSort(sortField);
             case 2 -> new MergeSort(sortField);
+            case 3 -> new EvenPowerSort(sortField);
             default -> throw new IllegalArgumentException(
                     "Неизвестный алгоритм сортировки: " + algorithmId
             );
