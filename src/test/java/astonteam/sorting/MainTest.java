@@ -53,7 +53,7 @@ class MainTest {
         byte[] previous = Files.exists(carsFile) ? Files.readAllBytes(carsFile) : null;
         try {
             TestSupport.Outcome outcome =
-                    TestSupport.run("1\n1\n150\nToyota\n2015\n4\n5\n",
+                    TestSupport.run("1\n1\n150\nToyota\n2015\n5\n6\n",
                             () -> Main.main(new String[0])
                     );
             assertNull(outcome.error());
