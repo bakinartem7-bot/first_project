@@ -18,6 +18,7 @@ public class SortingMenu {
             return;
         }
 
+        // --- меню и выбор алгоритма/поля (твой код) ---
         Menu algorithmMenu = new Menu("Выберите алгоритм сортировки", List.of(
                 new MenuItem(1, "Сортировка вставками"),
                 new MenuItem(2, "Сортировка слиянием")
@@ -29,7 +30,6 @@ public class SortingMenu {
                 new MenuItem(2, "Модель"),
                 new MenuItem(3, "Год выпуска")
         ));
-
         int fieldId = fieldMenu.ask(input).id();
 
         String sortField;
@@ -48,21 +48,18 @@ public class SortingMenu {
                 sortField = "year";
                 comparator = CarComparators.BY_YEAR;
             }
-            default -> throw new IllegalArgumentException(
-                    "Неизвестное поле сортировки: " + fieldId
-            );
+            default -> throw new IllegalArgumentException("Неизвестное поле сортировки: " + fieldId);
         }
 
         SortStrategy strategy = switch (algorithmId) {
             case 1 -> new InsertionSort(sortField);
             case 2 -> new MergeSort(sortField);
-            default -> throw new IllegalArgumentException(
-                    "Неизвестный алгоритм сортировки: " + algorithmId
-            );
+            default -> throw new IllegalArgumentException("Неизвестный алгоритм сортировки: " + algorithmId);
         };
 
         SortingStatistics statistics = strategy.sort(cars, comparator);
 
+        // --- ЭТОТ БЛОК ДОЛЖЕН БЫТЬ ВНУТРИ МЕТОДА (до последней }) ---
         System.out.println("Сортировка завершена.");
         System.out.println("Алгоритм: " + statistics.algorithmName());
         System.out.println("Поле: " + statistics.sortField());
@@ -75,5 +72,6 @@ public class SortingMenu {
         for (Car car : cars) {
             System.out.println(car);
         }
-    }
+        // -------------------------------------------------------------
+    } // <--- вот эта скобка должна быть ПОСЛЕ цикла for, а не до него
 }
