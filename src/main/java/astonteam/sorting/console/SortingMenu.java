@@ -18,7 +18,7 @@ public class SortingMenu {
             return;
         }
 
-        // --- меню и выбор алгоритма/поля (твой код) ---
+        // ---  ---
         Menu algorithmMenu = new Menu("Выберите алгоритм сортировки", List.of(
                 new MenuItem(1, "Сортировка вставками"),
                 new MenuItem(2, "Сортировка слиянием")
@@ -59,7 +59,7 @@ public class SortingMenu {
 
         SortingStatistics statistics = strategy.sort(cars, comparator);
 
-        // --- ЭТОТ БЛОК ДОЛЖЕН БЫТЬ ВНУТРИ МЕТОДА (до последней }) ---
+        // ---  ---
         System.out.println("Сортировка завершена.");
         System.out.println("Алгоритм: " + statistics.algorithmName());
         System.out.println("Поле: " + statistics.sortField());
@@ -73,5 +73,5 @@ public class SortingMenu {
             System.out.println(car);
         }
         // -------------------------------------------------------------
-    } // <--- вот эта скобка должна быть ПОСЛЕ цикла for, а не до него
+    } // 
 }
