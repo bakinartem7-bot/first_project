@@ -1,3 +1,4 @@
+
 package astonteam.sorting.collection;
 
 import astonteam.sorting.model.Car;
@@ -74,6 +75,7 @@ class CarArrayListTest {
         cars.add(car(100));
         assertThrows(IndexOutOfBoundsException.class, () -> cars.get(-1));
         assertThrows(IndexOutOfBoundsException.class, () -> cars.get(1));
+        assertThrows(IndexOutOfBoundsException.class, () -> cars.get(100));
     }
 
     /**
@@ -98,6 +100,7 @@ class CarArrayListTest {
     void setRejectsInvalidArguments() {
         CarArrayList cars = new CarArrayList();
         cars.add(car(100));
+        assertThrows(IndexOutOfBoundsException.class, () -> cars.set(-1, car(150)));
         assertThrows(IndexOutOfBoundsException.class, () -> cars.set(1, car(150)));
         assertThrows(NullPointerException.class, () -> cars.set(0, null));
     }
@@ -178,6 +181,26 @@ class CarArrayListTest {
         assertEquals(count, cars.size());
         assertEquals(count, cars.get(count - 1).getPower());
         assertEquals(1, cars.get(0).getPower());
+    }
+    /**
+     * Проверяет точный порог роста ёмкости (начальная ёмкость 10).
+     */
+    @Test
+    void growsExactlyAtCapacityBoundary() {
+        CarArrayList cars = new CarArrayList();
+        int initialCapacity = 10;
+
+        for (int i = 1; i <= initialCapacity; i++) {
+            cars.add(car(i));
+        }
+        assertEquals(initialCapacity, cars.size());
+
+        Car extraCar = car(11);
+        cars.add(extraCar);
+
+        assertEquals(11, cars.size());
+        assertEquals(11, cars.get(10).getPower());
+        assertSame(extraCar, cars.get(10));
     }
 
     /**
