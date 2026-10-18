@@ -24,7 +24,7 @@ class MainTest {
     @Test
     void fillAndExit() {
         TestSupport.Outcome outcome =
-                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n5\n", () -> Main.main(new String[0]));
+                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n6\n", () -> Main.main(new String[0]));
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
         assertTrue(outcome.output().contains("Работа завершена."));
@@ -37,7 +37,7 @@ class MainTest {
     @Test
     void invalidSizeIsRejectedThenAcceptsValid() {
         TestSupport.Outcome outcome =
-                TestSupport.run("1\n1\n0\n1\n150\nToyota\n2015\n5\n", () -> Main.main(new String[0]));
+                TestSupport.run("1\n1\n0\n1\n150\nToyota\n2015\n6\n", () -> Main.main(new String[0]));
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
     }
@@ -49,7 +49,7 @@ class MainTest {
     @Test
     void attemptsExceededReturnsToMenu() {
         TestSupport.Outcome outcome =
-                TestSupport.run("9\n9\n9\n9\n9\n5\n", () -> Main.main(new String[0]));
+                TestSupport.run("9\n9\n9\n9\n9\n6\n", () -> Main.main(new String[0]));
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Возврат в меню"));
         assertTrue(outcome.output().contains("Работа завершена."));
@@ -79,7 +79,7 @@ class MainTest {
         byte[] previous = Files.exists(carsFile) ? Files.readAllBytes(carsFile) : null;
         try {
             TestSupport.Outcome outcome =
-                    TestSupport.run("1\n1\n1\n150\nToyota\n2015\n4\n5\n",
+                    TestSupport.run("1\n1\n1\n150\nToyota\n2015\n4\n6\n",
                             () -> Main.main(new String[0])
                     );
             assertNull(outcome.error());
@@ -105,7 +105,7 @@ class MainTest {
     @Test
     void searchOptionFindsCarAndReturnsToMainMenu() {
         TestSupport.Outcome outcome = TestSupport.run(
-                "1\n1\n1\n150\nToyota\n2015\n3\n1\n150\n5\n",
+                "1\n1\n1\n150\nToyota\n2015\n3\n1\n150\n6\n",
                 () -> Main.main(new String[0])
         );
 
@@ -124,7 +124,7 @@ class MainTest {
     @Test
     void searchOptionOnEmptyCollectionReturnsToMainMenu() {
         TestSupport.Outcome outcome = TestSupport.run(
-                "3\n5\n",
+                "3\n6\n",
                 () -> Main.main(new String[0])
         );
 
