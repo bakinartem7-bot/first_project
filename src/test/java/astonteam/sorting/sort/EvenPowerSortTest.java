@@ -62,9 +62,11 @@ class EvenPowerSortTest {
         testCars.add(car(100, "Even-100", 2020));
         testCars.add(car(99, "Odd-99", 2019));
         testCars.add(car(200, "Even-200", 2018));
-
+        Car odd101 = testCars.get(1);
+        Car odd99 = testCars.get(3);
         new EvenPowerSort("power").sort(testCars, CarComparators.BY_POWER);
-
+        assertSame(odd101, testCars.get(1));
+        assertSame(odd99, testCars.get(3));
         assertEquals(100, testCars.get(0).getPower());
         assertEquals(101, testCars.get(1).getPower());
         assertEquals(200, testCars.get(2).getPower());
@@ -109,21 +111,25 @@ class EvenPowerSortTest {
      */
     @Test
     void whenSortingAlreadySortedCollectionThenEvenCarsStaySortedAndOddCarsStayInPlace() {
-        Car oddCarAtIndex1 = cars.get(1);
-        Car oddCarAtIndex3 = cars.get(3);
-
+        Car[] originalCars = new Car[cars.size()];
+        for (int i = 0; i < cars.size(); i++) {
+            originalCars[i] = cars.get(i);
+        }
         new EvenPowerSort("power").sort(cars, CarComparators.BY_POWER);
-
         int previousEvenPower = Integer.MIN_VALUE;
-        for (Car car : cars) {
+        for (int i = 0; i < cars.size(); i++) {
+            Car car = cars.get(i);
             if (car.getPower() % 2 == 0) {
                 assertTrue(car.getPower() >= previousEvenPower);
                 previousEvenPower = car.getPower();
+            } else {
+                assertSame(
+                        originalCars[i],
+                        car,
+                        "Автомобиль с нечётной мощностью должен остаться на исходной позиции " + i
+                );
             }
         }
-
-        assertSame(oddCarAtIndex1, cars.get(1));
-        assertSame(oddCarAtIndex3, cars.get(3));
     }
 
     /**
