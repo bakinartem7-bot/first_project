@@ -103,6 +103,10 @@ class MergeSortTest {
         CarArrayList emptyCars = new CarArrayList();
         new MergeSort("power").sort(emptyCars, CarComparators.BY_POWER);
         assertEquals(0, emptyCars.size(), "Пустая коллекция должна оставаться пустой после сортировки");
+        new MergeSort("model").sort(emptyCars, CarComparators.BY_MODEL);
+        assertEquals(0, emptyCars.size(), "Пустая коллекция должна оставаться пустой после сортировки");
+        new MergeSort("year").sort(emptyCars, CarComparators.BY_YEAR);
+        assertEquals(0, emptyCars.size(), "Пустая коллекция должна оставаться пустой после сортировки");
     }
 
     /**
@@ -110,7 +114,7 @@ class MergeSortTest {
      * становится упорядоченной по мощности.
      */
     @Test
-    void whenSortingUnsortedCollectionThenItBecomesSorted() {
+    void whenSortingByPowerUnsortedCollectionThenItBecomesSorted() {
         CarArrayList testCars = new CarArrayList();
         testCars.add(car(300, "A", 2020));
         testCars.add(car(100, "B", 2021));
@@ -119,6 +123,39 @@ class MergeSortTest {
         assertEquals(100, testCars.get(0).getPower());
         assertEquals(200, testCars.get(1).getPower());
         assertEquals(300, testCars.get(2).getPower());
+    }
+
+    /**
+     * Проверяет, что неотсортированная коллекция после сортировки
+     * становится упорядоченной по модели.
+     */
+    @Test
+    void whenSortingByModelUnsortedCollectionThenItBecomesSorted() {
+        CarArrayList testCars = new CarArrayList();
+        testCars.add(car(300, "C", 2020));
+        testCars.add(car(100, "B", 2021));
+        testCars.add(car(200, "A", 2022));
+        new MergeSort("model").sort(testCars, CarComparators.BY_MODEL);
+        assertEquals("A", testCars.get(0).getModel());
+        assertEquals("B", testCars.get(1).getModel());
+        assertEquals("C", testCars.get(2).getModel());
+    }
+
+
+    /**
+     * Проверяет, что неотсортированная коллекция после сортировки
+     * становится упорядоченной по году.
+     */
+    @Test
+    void whenSortingByYearUnsortedCollectionThenItBecomesSorted() {
+        CarArrayList testCars = new CarArrayList();
+        testCars.add(car(300, "A", 2022));
+        testCars.add(car(100, "B", 2021));
+        testCars.add(car(200, "C", 2020));
+        new MergeSort("year").sort(testCars, CarComparators.BY_YEAR);
+        assertEquals(2020, testCars.get(0).getYear());
+        assertEquals(2021, testCars.get(1).getYear());
+        assertEquals(2022, testCars.get(2).getYear());
     }
 
     /**
@@ -161,16 +198,47 @@ class MergeSortTest {
      * по мощности в коллекции.
      */
     @Test
-    void whenCollectionHasDuplicatesThenSortedCorrectly() {
-        cars.add(car(150, "Model50", 2025));
-        cars.add(car(150, "Model50", 2025));
-        new MergeSort("power").sort(cars, CarComparators.BY_POWER);
-        for (int i = 1; i < cars.size(); i++) {
-            assertTrue(
-                    cars.get(i - 1).getPower() <= cars.get(i).getPower(),
-                    "Коллекция не отсортирована по мощности на позиции " + i
-            );
-        }
+    void whenCollectionHasDuplicatesThenSortedByPowerCorrectly() {
+        CarArrayList samePowerCars = new CarArrayList();
+        samePowerCars.add(car(150, "Model50", 2025));
+        samePowerCars.add(car(100, "Model30", 2024));
+        samePowerCars.add(car(150, "Model10", 2023));
+        new MergeSort("power").sort(samePowerCars, CarComparators.BY_POWER);
+        assertEquals("Model30", samePowerCars.get(0).getModel());
+        assertEquals("Model50", samePowerCars.get(1).getModel());
+        assertEquals("Model10", samePowerCars.get(2).getModel());
+    }
+
+    /**
+     * Проверяет корректность сортировки при наличии дубликатов
+     * по модели в коллекции.
+     */
+    @Test
+    void whenCollectionHasDuplicatesThenSortedByModelCorrectly() {
+        CarArrayList sameModelCars = new CarArrayList();
+        sameModelCars.add(car(200, "Model50", 2025));
+        sameModelCars.add(car(150, "Model10", 2024));
+        sameModelCars.add(car(100, "Model50", 2023));
+        new MergeSort("model").sort(sameModelCars, CarComparators.BY_MODEL);
+        assertEquals(150, sameModelCars.get(0).getPower());
+        assertEquals(200, sameModelCars.get(1).getPower());
+        assertEquals(100, sameModelCars.get(2).getPower());
+    }
+
+    /**
+     * Проверяет корректность сортировки при наличии дубликатов
+     * по году в коллекции.
+     */
+    @Test
+    void whenCollectionHasDuplicatesThenSortedByYearCorrectly() {
+        CarArrayList sameYearCars = new CarArrayList();
+        sameYearCars.add(car(250, "Model50", 2025));
+        sameYearCars.add(car(150, "Model30", 2020));
+        sameYearCars.add(car(100, "Model10", 2025));
+        new MergeSort("year").sort(sameYearCars, CarComparators.BY_YEAR);
+        assertEquals("Model30", sameYearCars.get(0).getModel());
+        assertEquals("Model50", sameYearCars.get(1).getModel());
+        assertEquals("Model10", sameYearCars.get(2).getModel());
     }
 
     /**
@@ -178,7 +246,7 @@ class MergeSortTest {
      * становится неубывающим по мощности.
      */
     @Test
-    void whenSortingReverseOrderedCollectionThenItBecomesSorted() {
+    void whenSortingReverseOrderedCollectionByPowerThenItBecomesSorted() {
         CarArrayList testCars = new CarArrayList();
 
         testCars.add(car(300, "C", 2022));
@@ -191,6 +259,38 @@ class MergeSortTest {
     }
 
     /**
+     * Проверяет, что обратный порядок элементов после сортировки
+     * становится неубывающим по модели.
+     */
+    @Test
+    void whenSortingReverseOrderedCollectionByModelThenItBecomesSorted() {
+        CarArrayList testCars = new CarArrayList();
+        testCars.add(car(300, "C", 2022));
+        testCars.add(car(200, "B", 2021));
+        testCars.add(car(100, "A", 2020));
+        new MergeSort("model").sort(testCars, CarComparators.BY_MODEL);
+        assertEquals("A", testCars.get(0).getModel());
+        assertEquals("B", testCars.get(1).getModel());
+        assertEquals("C", testCars.get(2).getModel());
+    }
+
+    /**
+     * Проверяет, что обратный порядок элементов после сортировки
+     * становится неубывающим по году.
+     */
+    @Test
+    void whenSortingReverseOrderedCollectionByYearThenItBecomesSorted() {
+        CarArrayList testCars = new CarArrayList();
+        testCars.add(car(300, "C", 2022));
+        testCars.add(car(200, "B", 2021));
+        testCars.add(car(100, "A", 2020));
+        new MergeSort("year").sort(testCars, CarComparators.BY_YEAR);
+        assertEquals(2020, testCars.get(0).getYear());
+        assertEquals(2021, testCars.get(1).getYear());
+        assertEquals(2022, testCars.get(2).getYear());
+    }
+
+    /**
      * Проверяет стабильность сортировки: автомобили с равной мощностью
      * сохраняют исходный относительный порядок.
      */
@@ -199,17 +299,52 @@ class MergeSortTest {
         Car first = car(150, "First", 2020);
         Car second = car(150, "Second", 2021);
         Car third = car(150, "Third", 2022);
-        Car fourth = car(150, "Fourth", 2023);
         CarArrayList testCars = new CarArrayList();
         testCars.add(first);
         testCars.add(second);
         testCars.add(third);
-        testCars.add(fourth);
         new MergeSort("power").sort(testCars, CarComparators.BY_POWER);
         assertEquals("First", testCars.get(0).getModel());
         assertEquals("Second", testCars.get(1).getModel());
         assertEquals("Third", testCars.get(2).getModel());
-        assertEquals("Fourth", testCars.get(3).getModel());
+    }
+
+    /**
+     * Проверяет стабильность сортировки: автомобили с равной моделью
+     * сохраняют исходный относительный порядок.
+     */
+    @Test
+    void whenEqualModelThenOriginalOrderIsPreserved() {
+        Car first = car(250, "Model", 2020);
+        Car second = car(200, "Model", 2021);
+        Car third = car(150, "Model", 2022);
+        CarArrayList testCars = new CarArrayList();
+        testCars.add(first);
+        testCars.add(second);
+        testCars.add(third);
+        new MergeSort("model").sort(testCars, CarComparators.BY_MODEL);
+        assertEquals(250, testCars.get(0).getPower());
+        assertEquals(200, testCars.get(1).getPower());
+        assertEquals(150, testCars.get(2).getPower());
+    }
+
+    /**
+     * Проверяет стабильность сортировки: автомобили с равным годом
+     * сохраняют исходный относительный порядок.
+     */
+    @Test
+    void whenEqualYearThenOriginalOrderIsPreserved() {
+        Car first = car(250, "First", 2020);
+        Car second = car(200, "Second", 2020);
+        Car third = car(150, "Third", 2020);
+        CarArrayList testCars = new CarArrayList();
+        testCars.add(first);
+        testCars.add(second);
+        testCars.add(third);
+        new MergeSort("year").sort(testCars, CarComparators.BY_YEAR);
+        assertEquals("First", testCars.get(0).getModel());
+        assertEquals("Second", testCars.get(1).getModel());
+        assertEquals("Third", testCars.get(2).getModel());
     }
 
     /**
