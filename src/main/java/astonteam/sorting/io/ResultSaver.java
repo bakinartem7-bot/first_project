@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  * Сохраняет результаты сортировки и коллекции автомобилей в текстовые файлы.
  */
 public final class ResultSaver {
-
     /** Шаблон допустимого имени файла. */
     private static final Pattern SAFE_FILE_NAME =
             Pattern.compile("[A-Za-z0-9_.-]{1," + Limits.MAX_FILE_NAME_LENGTH + "}");
@@ -86,16 +85,12 @@ public final class ResultSaver {
         lines.addAll(statisticsBlock(statistics));
 
         Path file = resolveSafe("sorting_" + LocalDateTime.now().format(FILE_STAMP) + ".txt");
-        write(file, lines);
+        write(file, lines, false);
         return file;
     }
 
     /**
-     * Сохраняет коллекцию автомобилей в файл с указанным именем.
-     *
-     * @param fileName имя файла для сохранения
-     * @param cars     коллекция автомобилей
-     * @return путь к сохранённому файлу
+     * Сохраняет коллекцию автомобилей в файл с указанным именем (ПЕРЕЗАПИСЬ).
      */
     public Path saveCollection(String fileName, Iterable<Car> cars) {
         Objects.requireNonNull(cars, "cars");
@@ -104,16 +99,42 @@ public final class ResultSaver {
         List<String> lines = checked.stream()
                 .map(CarLineFormat::format)
                 .collect(Collectors.toList());
-        write(file, lines);
+        write(file, lines, false);
         return file;
     }
 
     /**
-     * Проверяет имя файла и строит безопасный путь внутри базового каталога.
+     * ДОПИСЫВАЕТ коллекцию автомобилей в конец файла (APPEND).
+     * Добавляет человекочитаемую шапку с датой и названием действия.
      *
      * @param fileName имя файла
-     * @return нормализованный путь внутри базового каталога
+     * @param cars коллекция автомобилей
+     * @param actionName название действия (например, "Результат сортировки" или "Результат поиска")
+     * @return путь к файлу
      */
+    public Path appendCollection(String fileName, Iterable<Car> cars, String actionName) {
+        Objects.requireNonNull(cars, "cars");
+        Objects.requireNonNull(actionName, "actionName");
+        List<Car> checked = checkedCopy(cars, "коллекция");
+        Path file = resolveSafe(fileName);
+
+        List<String> lines = new ArrayList<>();
+        lines.add("");
+        lines.add("--- " + actionName + " | Дата: " + LocalDateTime.now().format(DATE_STAMP) + " ---");
+
+        if (checked.isEmpty()) {
+            lines.add("(пустая коллекция)");
+        } else {
+            for (int i = 0; i < checked.size(); i++) {
+                lines.add((i + 1) + ". " + CarLineFormat.format(checked.get(i)));
+            }
+        }
+        lines.add("--------------------------------------------------");
+
+        write(file, lines, true);
+        return file;
+    }
+
     private Path resolveSafe(String fileName) {
         String name = TextSanitizer.normalize(fileName);
         if (name.isEmpty()) {
@@ -129,13 +150,6 @@ public final class ResultSaver {
         return resolved;
     }
 
-    /**
-     * Создаёт копию коллекции, проверяя элементы на null и корректность.
-     *
-     * @param cars коллекция автомобилей
-     * @param name имя коллекции для сообщений об ошибке
-     * @return список проверенных автомобилей
-     */
     private List<Car> checkedCopy(Iterable<Car> cars, String name) {
         Objects.requireNonNull(cars, name);
         List<Car> copy = new ArrayList<>();
@@ -149,12 +163,6 @@ public final class ResultSaver {
         return copy;
     }
 
-    /**
-     * Проверяет корректность модели автомобиля.
-     *
-     * @param car  автомобиль для проверки
-     * @param name имя коллекции для сообщений об ошибке
-     */
     private void requireValidCar(Car car, String name) {
         String model = car.getModel();
         if (model == null || model.isBlank()) {
@@ -165,13 +173,6 @@ public final class ResultSaver {
         }
     }
 
-    /**
-     * Формирует строки таблицы с автомобилями.
-     *
-     * @param title заголовок таблицы
-     * @param cars  автомобили для вывода
-     * @return строки таблицы
-     */
     private List<String> carTable(String title, List<Car> cars) {
         List<String> lines = new ArrayList<>();
         lines.add("");
@@ -186,12 +187,6 @@ public final class ResultSaver {
         return lines;
     }
 
-    /**
-     * Формирует строки блока статистики сортировки.
-     *
-     * @param statistics статистика сортировки
-     * @return строки блока статистики
-     */
     private List<String> statisticsBlock(SortingStatistics statistics) {
         List<String> lines = new ArrayList<>();
         lines.add("");
@@ -206,21 +201,24 @@ public final class ResultSaver {
     }
 
     /**
-     * Записывает строки в файл атомарно через временный файл.
-     *
-     * @param file  целевой файл
-     * @param lines строки для записи
+     * Записывает строки в файл.
+     * @param append если true - дописывает в конец (APPEND), иначе перезаписывает.
      */
-    private void write(Path file, List<String> lines) {
-        Path temp = file.resolveSibling(file.getFileName() + ".tmp");
+    private void write(Path file, List<String> lines, boolean append) {
         try {
             Files.createDirectories(baseDirectory);
-            Files.write(temp, lines, StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-            moveAtomically(temp, file);
-            System.out.println("Файл сохранён: " + file);
+            if (append) {
+                Files.write(file, lines, StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                System.out.println("Данные успешно дописаны в файл: " + file);
+            } else {
+                Path temp = file.resolveSibling(file.getFileName() + ".tmp");
+                Files.write(temp, lines, StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+                moveAtomically(temp, file);
+                System.out.println("Файл сохранён: " + file);
+            }
         } catch (IOException e) {
-            deleteQuietly(temp);
             throw new UncheckedIOException("Не удалось записать файл " + file, e);
         }
     }
@@ -237,19 +235,6 @@ public final class ResultSaver {
             Files.move(temp, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         } catch (AtomicMoveNotSupportedException e) {
             Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
-        }
-    }
-
-    /**
-     * Удаляет файл, игнорируя ошибки удаления.
-     *
-     * @param path путь к удаляемому файлу
-     */
-    private void deleteQuietly(Path path) {
-        try {
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            System.err.println("Не удалось удалить временный файл: " + path);
         }
     }
 }

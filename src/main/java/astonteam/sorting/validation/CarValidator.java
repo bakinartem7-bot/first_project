@@ -26,6 +26,9 @@ public final class CarValidator {
         if (model == null || model.isBlank()) {
             return ValidationResult.error("модель не должна быть пустой");
         }
+        if (model.length() > Limits.MAX_MODEL_LENGTH) {
+            return ValidationResult.error("Модель длиннее " + Limits.MAX_MODEL_LENGTH + " символов");
+        }
         if (year < Limits.MIN_YEAR || year > Limits.MAX_YEAR) {
             return ValidationResult.error("год вне диапазона " + Limits.MIN_YEAR + ".." + Limits.MAX_YEAR);
         }

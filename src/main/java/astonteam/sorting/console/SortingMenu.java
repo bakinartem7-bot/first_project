@@ -1,6 +1,7 @@
 package astonteam.sorting.console;
 
 import astonteam.sorting.collection.CarArrayList;
+import astonteam.sorting.io.ResultSaver;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.sort.CarComparators;
 import astonteam.sorting.sort.EvenPowerSort;
@@ -12,21 +13,8 @@ import astonteam.sorting.stats.SortingStatistics;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Консольное меню сортировки: выбор алгоритма и поля сортировки, запуск сортировки и вывод статистики.
- */
 public class SortingMenu {
-    /**
-     * Сортирует коллекцию автомобилей по выбранному пользователем полю и алгоритму,
-     * затем выводит статистику сортировки и результат.
-     *
-     * @param cars  сортируемая коллекция автомобилей
-     * @param input источник пользовательского ввода
-     * @throws AttemptsExceededException если превышено допустимое число ошибок ввода
-     * @throws EndOfInputException       если поток ввода завершён
-     * @throws IllegalArgumentException   если выбрано неизвестное поле или алгоритм сортировки
-     */
-    public static void sortCars(CarArrayList cars, ConsoleInput input) {
+    public static void sortCars(CarArrayList cars, ConsoleInput input, ResultSaver saver) {
         if (cars.size() == 0) {
             System.out.println("Сначала заполните коллекцию автомобилями.");
             return;
@@ -93,6 +81,11 @@ public class SortingMenu {
         System.out.println("Отсортированная коллекция:");
         for (Car car : cars) {
             System.out.println(car);
+        }
+
+        // Задача 15: Предлагаем дописать отсортированную коллекцию в файл
+        if (input.readYesNo("Дописать отсортированную коллекцию в файл history.txt?")) {
+            saver.appendCollection("history.txt", cars, "Результат сортировки (" + statistics.algorithmName() + " по " + sortField + ")");
         }
     }
 }
