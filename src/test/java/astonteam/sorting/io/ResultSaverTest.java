@@ -173,4 +173,27 @@ class ResultSaverTest {
         assertThrows(NullPointerException.class,
                 () -> saver.saveReport(List.of(), List.of(), null));
     }
+
+    /**
+     * Проверяет, что метод appendCollection дописывает данные, не стирая предыдущие.
+     */
+    @Test
+    void appendCollectionAddsToEndWithoutOverwriting() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        Path file = directory.resolve("history.txt");
+
+        // Первая запись
+        saver.appendCollection("history.txt", List.of(car(150, "Toyota", 2015)), "Первая запись");
+
+        // Вторая запись (дописывание)
+        saver.appendCollection("history.txt", List.of(car(90, "BMW", 2010)), "Вторая запись");
+
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+
+        // Проверяем, что обе записи присутствуют в файле
+        assertTrue(content.contains("Toyota"));
+        assertTrue(content.contains("BMW"));
+        assertTrue(content.contains("Первая запись"));
+        assertTrue(content.contains("Вторая запись"));
+    }
 }
