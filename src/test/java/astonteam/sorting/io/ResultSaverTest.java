@@ -196,4 +196,14 @@ class ResultSaverTest {
         assertTrue(content.contains("Первая запись"));
         assertTrue(content.contains("Вторая запись"));
     }
+
+    //Тест на сохранение кириллицы в UTF-8
+    @Test
+    void saveCollectionWritesUtf8Cyrillic() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        Path file = saver.saveCollection("cirillic.txt", List.of(car(150, "Лада", 2015)));
+
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        assertEquals("150;Лада;2015" + System.lineSeparator(), content);
+    }
 }
