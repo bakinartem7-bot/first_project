@@ -92,7 +92,7 @@ class MenuScenarioTest {
                 "100", "Audi", "2018",
                 "2", "1", "1", "нет",
                 "4",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
@@ -117,7 +117,7 @@ class MenuScenarioTest {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "2", "3",
                 "2", "2", "2", "да",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
@@ -141,7 +141,7 @@ class MenuScenarioTest {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", inputFile.toString(),
                 "2", "1", "3", "нет",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
@@ -162,7 +162,7 @@ class MenuScenarioTest {
     void nonexistentFileReportsErrorAndReturnsToMenu() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", "no_such_file_12345.txt",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
@@ -198,7 +198,7 @@ class MenuScenarioTest {
                 "1", "1", "1",
                 "9999", "Toyota", "2015",
                 "150", "Toyota", "2015",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
@@ -218,7 +218,7 @@ class MenuScenarioTest {
                 "150", "Toyota", "2015",
                 "2", "1", "1",
                 "maybe", "нет",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
@@ -236,12 +236,33 @@ class MenuScenarioTest {
                 "1", "3", "missing_file_999.txt",
                 "1", "1", "1",
                 "150", "Toyota", "2015",
-                "5"
+                "6"
         ));
 
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Файл не существует"));
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Позитивный сценарий: многопоточный подсчёт вхождений автомобиля
+     * выводит результат в консоль и возвращает в главное меню.
+     */
+    @Test
+    void countOptionPrintsOccurrencesAndReturnsToMainMenu() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "1", "3",
+                "150", "Toyota", "2015",
+                "150", "Toyota", "2015",
+                "100", "Audi", "2018",
+                "5", "150", "Toyota", "2015",
+                "6"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Автомобилей введено: 3"));
+        assertTrue(outcome.output().contains("Количество вхождений в коллекцию: 2"));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
 }
