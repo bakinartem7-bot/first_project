@@ -39,6 +39,8 @@ class CarTest {
     @Test
     void buildRejectsBlankModel() {
         assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(150).model("").year(2015).build()); //Проверка абсолютно пустой строки
+        assertThrows(IllegalArgumentException.class,
                 () -> Car.builder().power(150).model("   ").year(2015).build());
     }
 
@@ -57,6 +59,8 @@ class CarTest {
     @Test
     void buildRejectsPowerOutOfRange() {
         assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(0).model("Toyota").year(2015).build());
+        assertThrows(IllegalArgumentException.class,
                 () -> Car.builder().power(2001).model("Toyota").year(2015).build());
     }
 
@@ -66,7 +70,9 @@ class CarTest {
     @Test
     void buildRejectsYearOutOfRange() {
         assertThrows(IllegalArgumentException.class,
-                () -> Car.builder().power(150).model("Toyota").year(1800).build());
+                () -> Car.builder().power(150).model("Toyota").year(1885).build());
+        assertThrows(IllegalArgumentException.class,
+                () -> Car.builder().power(150).model("Toyota").year(2027).build());
     }
 
     /**
