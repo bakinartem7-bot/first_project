@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Тесты для {@link CarSearcher}: поиск автомобилей по отдельным полям и по целому объекту.
@@ -44,7 +45,6 @@ class CarSearcherTest {
     void setUp() {
         cars = new CarArrayList();
         searcher = new CarSearcher();
-
         cars.add(car(100, "Bmw", 2021));
         cars.add(car(150, "Toyota", 2021));
         cars.add(car(2000, "toyota", 1999));
@@ -60,8 +60,12 @@ class CarSearcherTest {
     void whenSearchingByPowerReturnsAllMatches() {
         CarArrayList foundCars = searcher.findByPower(cars, 100);
         assertEquals(2, foundCars.size());
-        assertEquals(100, foundCars.get(0).getPower());
-        assertEquals(100, foundCars.get(1).getPower());
+        assertSame(cars.get(0), foundCars.get(0));
+        assertSame(cars.get(5), foundCars.get(1));
+        assertEquals("Bmw", foundCars.get(0).getModel());
+        assertEquals(2021, foundCars.get(0).getYear());
+        assertEquals("Bmw", foundCars.get(1).getModel());
+        assertEquals(2022, foundCars.get(1).getYear());
     }
 
     /**
@@ -70,8 +74,9 @@ class CarSearcherTest {
     @Test
     void whenSearchingByModelIgnoresCaseAndReturnsAllMatches() {
         CarArrayList foundCars = searcher.findByModel(cars, "TOYOTA");
-
         assertEquals(2, foundCars.size());
+        assertSame(cars.get(1), foundCars.get(0));
+        assertSame(cars.get(2), foundCars.get(1));
         assertEquals("Toyota", foundCars.get(0).getModel());
         assertEquals("toyota", foundCars.get(1).getModel());
     }
@@ -83,8 +88,10 @@ class CarSearcherTest {
     void whenSearchingByYearReturnsAllMatches() {
         CarArrayList foundCars = searcher.findByYear(cars, 2022);
         assertEquals(2, foundCars.size());
-        assertEquals(2022, foundCars.get(0).getYear());
-        assertEquals(2022, foundCars.get(1).getYear());
+        assertSame(cars.get(4), foundCars.get(0));
+        assertSame(cars.get(5), foundCars.get(1));
+        assertEquals("Tesla", foundCars.get(0).getModel());
+        assertEquals("Bmw", foundCars.get(1).getModel());
     }
 
     /**
@@ -110,9 +117,36 @@ class CarSearcherTest {
      */
     @Test
     void whenSearchingForNonExistingCarThenReturnsEmptyCollection() {
-        Car target = car(999, "TOYOTA", 2021);
+        Car target = car(999, "YOTTOA", 1888);
 
         CarArrayList foundCars = searcher.findWholeCar(cars, target);
+        assertEquals(0, foundCars.size());
+    }
+
+    /**
+     * Проверяет, что поиск по несуществующей мощности возвращает пустую коллекцию.
+     */
+    @Test
+    void whenSearchingForNonExistingPowerThenReturnsEmptyCollection() {
+        CarArrayList foundCars = searcher.findByPower(cars, 999);
+        assertEquals(0, foundCars.size());
+    }
+
+    /**
+     * Проверяет, что поиск по несуществующей модели возвращает пустую коллекцию.
+     */
+    @Test
+    void whenSearchingForNonExistingModelThenReturnsEmptyCollection() {
+        CarArrayList foundCars = searcher.findByModel(cars, "XYZ");
+        assertEquals(0, foundCars.size());
+    }
+
+    /**
+     * Проверяет, что поиск по несуществующему году возвращает пустую коллекцию.
+     */
+    @Test
+    void whenSearchingForNonExistingYearThenReturnsEmptyCollection() {
+        CarArrayList foundCars = searcher.findByYear(cars, 3026);
         assertEquals(0, foundCars.size());
     }
 
@@ -124,7 +158,10 @@ class CarSearcherTest {
         CarArrayList emptyCars = new CarArrayList();
 
         CarArrayList foundCars = searcher.findByPower(emptyCars, 100);
-
+        assertEquals(0, foundCars.size());
+        foundCars = searcher.findByModel(emptyCars, "Model");
+        assertEquals(0, foundCars.size());
+        foundCars = searcher.findByYear(emptyCars, 2020);
         assertEquals(0, foundCars.size());
     }
 }
