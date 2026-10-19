@@ -5,6 +5,7 @@ package astonteam.sorting.console;
  */
 public final class AttemptsExceededException extends RuntimeException {
 
+    /** Идентификатор версии сериализации. */
     private static final long serialVersionUID = 1L;
 
     /**

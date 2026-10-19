@@ -7,7 +7,24 @@ import astonteam.sorting.search.CarSearcher;
 
 import java.util.List;
 
+/**
+ * Консольное меню поиска автомобилей по различным полям коллекции.
+ */
 public class SearchMenu {
+
+    /**
+     * Приватный конструктор для запрета создания экземпляров утилитного класса.
+     */
+    private SearchMenu() {
+    }
+
+    /**
+     * Запрашивает критерий поиска, выводит найденные автомобили и при желании сохраняет результат.
+     *
+     * @param cars  рабочая коллекция автомобилей
+     * @param input источник консольного ввода
+     * @param saver сервис записи результата в файл
+     */
     public static void searchCars(CarArrayList cars, ConsoleInput input, ResultSaver saver) {
         if (cars.size() == 0) {
             System.out.println("Сначала заполните коллекцию автомобилями.");
@@ -69,6 +86,11 @@ public class SearchMenu {
         }
     }
 
+    /**
+     * Выводит найденные автомобили или сообщение об отсутствии совпадений.
+     *
+     * @param foundCars коллекция найденных автомобилей
+     */
     private static void printResults(CarArrayList foundCars) {
         if (foundCars.size() == 0) {
             System.out.println("Совпадений не найдено.");

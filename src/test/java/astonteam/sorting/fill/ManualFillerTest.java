@@ -5,7 +5,6 @@ import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.common.Limits;
 import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.console.EndOfInputException;
-import astonteam.sorting.model.Car;
 import astonteam.sorting.validation.CarValidator;
 import org.junit.jupiter.api.Test;
 

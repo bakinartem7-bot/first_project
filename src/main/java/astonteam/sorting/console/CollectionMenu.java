@@ -8,6 +8,9 @@ import astonteam.sorting.model.Car;
  */
 public final class CollectionMenu {
 
+    /**
+     * Приватный конструктор для запрета создания экземпляров утилитного класса.
+     */
     private CollectionMenu() {
     }
 

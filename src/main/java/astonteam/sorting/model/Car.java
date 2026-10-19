@@ -108,6 +108,12 @@ public final class Car {
      */
     public static final class Builder {
 
+        /**
+         * Создаёт пустой построитель автомобиля.
+         */
+        public Builder() {
+        }
+
         /** Мощность двигателя. */
         private int power;
         /** Название модели. */

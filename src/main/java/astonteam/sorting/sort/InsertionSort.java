@@ -76,8 +76,7 @@ public class InsertionSort implements SortStrategy {
          */
         private long comparisons;
 
-        // Число сдвигов вправо и перемещений key,
-        // если ссылка в целевой позиции изменилась
+        /** Счётчик сдвигов и обменов за последний вызов сортировки. */
         private long swaps;
     }
 }

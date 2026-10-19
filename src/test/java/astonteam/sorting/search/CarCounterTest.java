@@ -12,10 +12,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class CarCounterTest {
 
+    /**
+     * Создаёт тестовый автомобиль с указанными параметрами.
+     *
+     * @param power мощность автомобиля
+     * @param model модель автомобиля
+     * @param year год выпуска автомобиля
+     * @return построенный объект {@link Car}
+     */
     private static Car car(int power, String model, int year) {
         return Car.builder().power(power).model(model).year(year).build();
     }
 
+    /**
+     * Проверяет, что для пустой коллекции подсчёт возвращает ноль.
+     */
     @Test
     void shouldReturnZeroForEmptyCollection() {
         CarCounter counter = new CarCounter();
@@ -24,6 +35,9 @@ class CarCounterTest {
         assertEquals(0, counter.countOccurrences(cars, target));
     }
 
+    /**
+     * Проверяет, что при единственном совпадении подсчёт возвращает единицу.
+     */
     @Test
     void shouldCountSingleMatch() {
         CarCounter counter = new CarCounter();
@@ -33,6 +47,9 @@ class CarCounterTest {
         assertEquals(1, counter.countOccurrences(cars, target));
     }
 
+    /**
+     * Проверяет, что при отсутствии совпадений подсчёт возвращает ноль.
+     */
     @Test
     void shouldReturnZeroWhenNoMatches() {
         CarCounter counter = new CarCounter();
@@ -42,6 +59,10 @@ class CarCounterTest {
         assertEquals(0, counter.countOccurrences(cars, target));
     }
 
+    /**
+     * Проверяет, что при нескольких совпадениях и неравномерном разбиении на потоки
+     * подсчитывается точное число вхождений.
+     */
     @Test
     void shouldCountMultipleMatchesAndHandleUnevenSplit() {
         CarCounter counter = new CarCounter();
@@ -65,6 +86,9 @@ class CarCounterTest {
         assertEquals(3, counter.countOccurrences(cars, target));
     }
 
+    /**
+     * Проверяет, что передача null-коллекции приводит к NullPointerException.
+     */
     @Test
     void shouldThrowNullPointerExceptionForNullCollection() {
         CarCounter counter = new CarCounter();
@@ -72,6 +96,9 @@ class CarCounterTest {
         assertThrows(NullPointerException.class, () -> counter.countOccurrences(null, target));
     }
 
+    /**
+     * Проверяет, что передача null-цели сравнения приводит к NullPointerException.
+     */
     @Test
     void shouldThrowNullPointerExceptionForNullTarget() {
         CarCounter counter = new CarCounter();

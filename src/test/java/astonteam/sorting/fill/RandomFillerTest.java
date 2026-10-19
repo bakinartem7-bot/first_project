@@ -1,8 +1,8 @@
 package astonteam.sorting.fill;
 
-import  astonteam.sorting.collection.CarArrayList;
-import  astonteam.sorting.common.Limits;
-import  astonteam.sorting.model.Car;
+import astonteam.sorting.collection.CarArrayList;
+import astonteam.sorting.common.Limits;
+import astonteam.sorting.model.Car;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +58,7 @@ public class RandomFillerTest {
      * Проверяет, что все сгенерированные автомобили валидны (не null, модель не пустая, поля в допустимых диапазонах).
      */
     @Test
-    void  shouldGenerateOnlyValidCars() {
+    void shouldGenerateOnlyValidCars() {
         int size = 100;
         CarArrayList result = randomFiller.fill(size);
 

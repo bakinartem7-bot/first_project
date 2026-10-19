@@ -4,21 +4,56 @@ import astonteam.sorting.TestSupport;
 import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.io.ResultSaver;
 import astonteam.sorting.model.Car;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+/**
+ * Тесты меню сортировки: выбор алгоритма и ключа сортировки,
+ * порядок сохранения коллекции и обработка пустой коллекции.
+ *
+ * <p>Все файлы результатов пишутся во временный каталог, тесты не трогают
+ * настоящий каталог {@code results/}.</p>
+ */
 class SortingMenuTest {
 
+    /** Временный каталог для файлов результатов. */
+    @TempDir
+    Path tempDir;
+
+    /**
+     * Перенаправляет каталог результатов во временный каталог.
+     */
+    @BeforeEach
+    void useTemporaryResultsDirectory() {
+        System.setProperty(ResultSaver.RESULTS_DIRECTORY_PROPERTY, tempDir.toString());
+    }
+
+    /**
+     * Возвращает систему в исходное состояние после теста.
+     */
+    @AfterEach
+    void resetResultsDirectory() {
+        System.clearProperty(ResultSaver.RESULTS_DIRECTORY_PROPERTY);
+    }
+
+    /**
+     * Проверяет, что merge-сортировка по мощности располагает автомобили
+     * по возрастанию мощности.
+     */
     @Test
     void whenMergeSortByPowerThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
         cars.add(Car.builder().model("Toyota").power(150).year(2020).build());
         cars.add(Car.builder().model("Toyota").power(100).year(2020).build());
-        // ДОБАВЛЕНО: \nнет\n в конец ввода
         TestSupport.Outcome outcome = TestSupport.run(
                 "2\n1\nнет\n",
                 () -> {
@@ -33,6 +68,10 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: MergeSort"));
     }
 
+    /**
+     * Проверяет, что merge-сортировка по модели располагает автомобили
+     * по алфавиту и выводит их в том же порядке.
+     */
     @Test
     void whenMergeSortByModelThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -57,6 +96,10 @@ class SortingMenuTest {
         );
     }
 
+    /**
+     * Проверяет, что сортировка вставками по году располагает автомобили
+     * по возрастанию года выпуска.
+     */
     @Test
     void whenInsertionSortByYearThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -76,6 +119,10 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: InsertionSort"));
     }
 
+    /**
+     * Проверяет, что сортировка чётных вставками меняет местами только
+     * автомобили с чётной мощностью, не затрагивая нечётный.
+     */
     @Test
     void whenEvenPowerInsertionSortThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -99,6 +146,10 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: EvenPowerInsertionSort"));
     }
 
+    /**
+     * Проверяет, что сортировка чётных слиянием меняет местами только
+     * автомобили с чётной мощностью, не затрагивая нечётный.
+     */
     @Test
     void whenEvenPowerMergeSortThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
@@ -122,6 +173,10 @@ class SortingMenuTest {
         assertTrue(outcome.output().contains("Алгоритм: EvenPowerMergeSort"));
     }
 
+    /**
+     * Проверяет, что сортировка пустой коллекции сообщает о необходимости
+     * сначала заполнить коллекцию и не завершает программу с ошибкой.
+     */
     @Test
     void whenCollectionIsEmptyThenPrintsMessage() {
         CarArrayList cars = new CarArrayList();

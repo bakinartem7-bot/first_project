@@ -9,6 +9,9 @@ import astonteam.sorting.search.CarCounter;
  */
 public final class CountMenu {
 
+    /**
+     * Приватный конструктор для запрета создания экземпляров утилитного класса.
+     */
     private CountMenu() {
     }
 

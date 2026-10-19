@@ -11,6 +11,12 @@ import java.util.Objects;
 public final class CarSearcher {
 
     /**
+     * Создаёт поисковик автомобилей.
+     */
+    public CarSearcher() {
+    }
+
+    /**
      * Находит все автомобили с указанной мощностью.
      *
      * @param cars   коллекция автомобилей для поиска

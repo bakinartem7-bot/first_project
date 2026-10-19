@@ -79,7 +79,10 @@ class FileFillerTest {
     void fillRejectsNullPath() {
         assertThrows(NullPointerException.class, () -> new FileFiller().fill(null));
     }
-    //Тест на корректное чтение кириллицы (UTF-8)
+
+    /**
+     * Проверяет, что кириллические названия моделей из UTF-8 файла читаются в коллекцию без искажений.
+     */
     @Test
     void fillReadsUtf8CyrillicCorrectly() throws IOException {
         Path file = tempDir.resolve("utf8.txt");
@@ -91,7 +94,10 @@ class FileFillerTest {
         assertEquals("Лада", cars.get(0).getModel());
         assertEquals("Нива", cars.get(1).getModel());
     }
-    //Тест на неверный разделитель (вместо ';' используется ',')
+
+    /**
+     * Проверяет, что строка с разделителем ',' вместо ';' отклоняется с IllegalArgumentException.
+     */
     @Test
     void fillRejectsWrongDelimiter() throws IOException {
         Path file = tempDir.resolve("wrong_delimiter.txt");
@@ -99,7 +105,10 @@ class FileFillerTest {
 
         assertThrows(IllegalArgumentException.class, () -> new FileFiller().fill(file));
     }
-    //Тест на проверку длины модели (превышение Limits.MAX_MODEL_LENGTH)
+
+    /**
+     * Проверяет, что модель длиннее {@code Limits.MAX_MODEL_LENGTH} отклоняется с IllegalArgumentException.
+     */
     @Test
     void fillRejectsTooLongModel() throws IOException {
         Path file = tempDir.resolve("long_model.txt");
