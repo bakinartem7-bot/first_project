@@ -4,9 +4,10 @@ import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.io.ResultSaver;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.sort.CarComparators;
-import astonteam.sorting.sort.EvenPowerSort;
-import astonteam.sorting.sort.InsertionSort;
+import astonteam.sorting.sort.EvenPowerMergeSort;
+import astonteam.sorting.sort.EvenPowerInsertionSort;
 import astonteam.sorting.sort.MergeSort;
+import astonteam.sorting.sort.InsertionSort;
 import astonteam.sorting.sort.SortStrategy;
 import astonteam.sorting.stats.SortingStatistics;
 
@@ -26,11 +27,12 @@ public class SortingMenu {
         Menu algorithmMenu = new Menu("Выберите алгоритм сортировки", List.of(
                 new MenuItem(1, "Сортировка вставками"),
                 new MenuItem(2, "Сортировка слиянием"),
-                new MenuItem(3, "Сортировка автомобилей с чётной мощностью")
+                new MenuItem(3, "Сортировка вставками (чётная мощность)"),
+                new MenuItem(4, "Сортировка слиянием (чётная мощность)")
         ));
         int algorithmId = algorithmMenu.ask(input).id();
 
-        if (algorithmId == 3) {
+        if (algorithmId == 3 || algorithmId == 4) {
             sortField = "power";
             comparator = CarComparators.BY_POWER;
         } else {
@@ -62,7 +64,8 @@ public class SortingMenu {
         SortStrategy strategy = switch (algorithmId) {
             case 1 -> new InsertionSort(sortField);
             case 2 -> new MergeSort(sortField);
-            case 3 -> new EvenPowerSort(sortField);
+            case 3 -> new EvenPowerInsertionSort();
+            case 4 -> new EvenPowerMergeSort();
             default -> throw new IllegalArgumentException(
                     "Неизвестный алгоритм сортировки: " + algorithmId
             );

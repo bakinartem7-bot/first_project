@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class SortingMenuTest {
 
@@ -76,11 +77,12 @@ class SortingMenuTest {
     }
 
     @Test
-    void whenEvenPowerSortThenCollectionIsSorted() {
+    void whenEvenPowerInsertionSortThenCollectionIsSorted() {
         CarArrayList cars = new CarArrayList();
         cars.add(Car.builder().model("Toyota").power(150).year(2020).build());
         cars.add(Car.builder().model("Toyota").power(100).year(2020).build());
         cars.add(Car.builder().model("Toyota").power(101).year(2020).build());
+        Car oddCar = cars.get(2);
         TestSupport.Outcome outcome = TestSupport.run(
                 "3\nнет\n",
                 () -> {
@@ -93,7 +95,31 @@ class SortingMenuTest {
         assertEquals(100, cars.get(0).getPower());
         assertEquals(150, cars.get(1).getPower());
         assertEquals(101, cars.get(2).getPower());
+        assertSame(oddCar, cars.get(2));
         assertTrue(outcome.output().contains("Алгоритм: EvenPowerInsertionSort"));
+    }
+
+    @Test
+    void whenEvenPowerMergeSortThenCollectionIsSorted() {
+        CarArrayList cars = new CarArrayList();
+        cars.add(Car.builder().model("Toyota").power(150).year(2020).build());
+        cars.add(Car.builder().model("Toyota").power(100).year(2020).build());
+        cars.add(Car.builder().model("Toyota").power(101).year(2020).build());
+        Car oddCar = cars.get(2);
+        TestSupport.Outcome outcome = TestSupport.run(
+                "4\nнет\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SortingMenu.sortCars(cars, input, new ResultSaver());
+                    }
+                }
+        );
+        assertNull(outcome.error());
+        assertEquals(100, cars.get(0).getPower());
+        assertEquals(150, cars.get(1).getPower());
+        assertEquals(101, cars.get(2).getPower());
+        assertSame(oddCar, cars.get(2));
+        assertTrue(outcome.output().contains("Алгоритм: EvenPowerMergeSort"));
     }
 
     @Test
