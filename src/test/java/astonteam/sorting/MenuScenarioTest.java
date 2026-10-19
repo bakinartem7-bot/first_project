@@ -103,7 +103,7 @@ class MenuScenarioTest {
                 "100", "Audi", "2018",
                 "3", "1", "1", "нет",
                 "7", "да",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -128,7 +128,7 @@ class MenuScenarioTest {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "2", "3",
                 "3", "2", "2", "да",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -152,7 +152,7 @@ class MenuScenarioTest {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", inputFile.toString(),
                 "3", "1", "3", "нет",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -176,7 +176,7 @@ class MenuScenarioTest {
                 "150", "Toyota", "2015",
                 "100", "Audi", "2018",
                 "2",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -196,7 +196,7 @@ class MenuScenarioTest {
                 "1", "2", "3",
                 "3", "2", "2", "да",
                 "6",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -261,7 +261,7 @@ class MenuScenarioTest {
                 "1", "1", "1",
                 "9999", "Toyota", "2015",
                 "150", "Toyota", "2015",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -281,7 +281,7 @@ class MenuScenarioTest {
                 "150", "Toyota", "2015",
                 "3", "1", "1",
                 "maybe", "нет",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -299,7 +299,7 @@ class MenuScenarioTest {
                 "1", "3", "missing_file_999.txt",
                 "1", "1", "1",
                 "150", "Toyota", "2015",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -320,7 +320,7 @@ class MenuScenarioTest {
                 "150", "Toyota", "2015",
                 "100", "Audi", "2018",
                 "5", "150", "Toyota", "2015",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -339,7 +339,7 @@ class MenuScenarioTest {
                 "1", "1", "1",
                 "150", "Toyota", "2015",
                 "7", "нет",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
@@ -371,12 +371,58 @@ class MenuScenarioTest {
                 "1", "1", "1",
                 "150", "Toyota;Corolla", "2015",
                 "150", "Toyota", "2015",
-                "8"
+                "8", "нет"
         ));
 
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("не должна содержать символ"));
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Позитивный сценарий: показ коллекции на пустой коллекции сообщает об этом
+     * и возвращает в главное меню.
+     */
+    @Test
+    void showCollectionOnEmptyCollectionReportsEmpty() {
+        TestSupport.Outcome outcome = runMain(lines("2", "8"));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Коллекция пуста."));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Позитивный сценарий: подсчёт вхождений на пустой коллекции сообщает
+     * о необходимости заполнить её и возвращает в главное меню.
+     */
+    @Test
+    void countOnEmptyCollectionReportsEmpty() {
+        TestSupport.Outcome outcome = runMain(lines("5", "8"));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Сначала заполните коллекцию автомобилями."));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Позитивный сценарий: «Назад» в подменю заполнения возвращает текущую
+     * коллекцию без изменений — ранее введённые машины остаются и показываются.
+     */
+    @Test
+    void fillMenuBackKeepsCurrentCollection() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "1", "1",
+                "150", "Toyota", "2015",
+                "1", "4",
+                "2",
+                "8", "нет"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Текущая коллекция (элементов: 1):"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2015"));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
 }

@@ -8,6 +8,7 @@ import astonteam.sorting.validation.CarValidator;
 import astonteam.sorting.validation.ValidationResult;
 
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Заполняет коллекцию автомобилей данными, вводимыми пользователем с консоли.
@@ -53,9 +54,9 @@ public final class ManualFiller {
         }
         System.out.printf("Введите %d автомобилей, заполняя поля по одному:%n", size);
         CarArrayList cars = new CarArrayList();
-        for (int i = 1; i <= size; i++) {
-            cars.add(readCar(i));
-        }
+        IntStream.rangeClosed(1, size)
+                .mapToObj(this::readCar)
+                .forEach(cars::add);
         return cars;
     }
 

@@ -47,7 +47,7 @@ class MainTest {
     @Test
     void fillAndExit() {
         TestSupport.Outcome outcome =
-                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n8\n", () -> Main.main(new String[0]));
+                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n8\nнет\n", () -> Main.main(new String[0]));
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
         assertTrue(outcome.output().contains("Работа завершена."));
@@ -60,7 +60,7 @@ class MainTest {
     @Test
     void invalidSizeIsRejectedThenAcceptsValid() {
         TestSupport.Outcome outcome =
-                TestSupport.run("1\n1\n0\n1\n150\nToyota\n2015\n8\n", () -> Main.main(new String[0]));
+                TestSupport.run("1\n1\n0\n1\n150\nToyota\n2015\n8\nнет\n", () -> Main.main(new String[0]));
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
     }
@@ -98,7 +98,7 @@ class MainTest {
         Path carsFile = tempDir.resolve("cars.txt");
 
         TestSupport.Outcome outcome =
-                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n7\nда\n8\n",
+                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n7\nда\n8\nнет\n",
                         () -> Main.main(new String[0])
                 );
 
@@ -116,7 +116,7 @@ class MainTest {
         Path carsFile = tempDir.resolve("cars.txt");
 
         TestSupport.Outcome outcome =
-                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n7\nнет\n8\n",
+                TestSupport.run("1\n1\n1\n150\nToyota\n2015\n7\nнет\n8\nнет\n",
                         () -> Main.main(new String[0])
                 );
 
@@ -132,7 +132,7 @@ class MainTest {
     @Test
     void searchOptionFindsCarAndReturnsToMainMenu() {
         TestSupport.Outcome outcome = TestSupport.run(
-                "1\n1\n1\n150\nToyota\n2015\n4\n1\n150\n8\n",
+                "1\n1\n1\n150\nToyota\n2015\n4\n1\n150\n8\nнет\n",
                 () -> Main.main(new String[0])
         );
 
@@ -160,5 +160,59 @@ class MainTest {
                 "Сначала заполните коллекцию автомобилями."
         ));
         assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Проверяет, что при выходе с непустой коллекцией программа предлагает
+     * сохранить её и после ответа «да» записывает файл.
+     *
+     * @throws Exception при ошибке чтения записного файла
+     */
+    @Test
+    void exitWithSaveWritesFile() throws Exception {
+        Path carsFile = tempDir.resolve("cars.txt");
+
+        TestSupport.Outcome outcome = TestSupport.run(
+                "1\n1\n1\n150\nToyota\n2015\n8\nда\n",
+                () -> Main.main(new String[0])
+        );
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Сохранить коллекцию перед выходом"));
+        assertTrue(outcome.output().contains("Файл сохранён"));
+        assertTrue(Files.exists(carsFile));
+        assertTrue(Files.readString(carsFile).contains("150;Toyota;2015"));
+    }
+
+    /**
+     * Проверяет, что при выходе отказ от сохранения оставляет файл незатронутым.
+     */
+    @Test
+    void exitWithSaveDeclinedDoesNotWriteFile() {
+        Path carsFile = tempDir.resolve("cars.txt");
+
+        TestSupport.Outcome outcome = TestSupport.run(
+                "1\n1\n1\n150\nToyota\n2015\n8\nнет\n",
+                () -> Main.main(new String[0])
+        );
+
+        assertNull(outcome.error());
+        assertFalse(Files.exists(carsFile));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Проверяет, что при пустой коллекции перед выходом вопрос о сохранении не задаётся.
+     */
+    @Test
+    void exitOnEmptyCollectionDoesNotAskToSave() {
+        Path carsFile = tempDir.resolve("cars.txt");
+
+        TestSupport.Outcome outcome = TestSupport.run("8\n", () -> Main.main(new String[0]));
+
+        assertNull(outcome.error());
+        assertFalse(outcome.output().contains("Сохранить коллекцию перед выходом"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+        assertFalse(Files.exists(carsFile));
     }
 }

@@ -194,6 +194,36 @@ class ResultSaverTest {
     }
 
     /**
+     * Проверяет, что дописывание пустой коллекции создаёт запись с пометкой
+     * «(пустая коллекция)» вместо исключения.
+     *
+     * @throws IOException при чтении записанного файла
+     */
+    @Test
+    void appendCollectionMarksEmptyCollection() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+
+        Path file = saver.appendCollection("history.txt", List.of(), "Результат поиска");
+
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        assertTrue(content.contains("Результат поиска"));
+        assertTrue(content.contains("(пустая коллекция)"));
+    }
+
+    /**
+     * Проверяет, что имя «..» не даёт пути выйти за пределы каталога результатов.
+     */
+    @Test
+    void saveCollectionRejectsPathTraversal() {
+        ResultSaver saver = new ResultSaver(directory);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> saver.saveCollection("..", List.of(car(150, "Toyota", 2015))));
+
+        assertTrue(error.getMessage().contains("за пределы каталога"));
+    }
+
+    /**
      * Проверяет, что readLines читает содержимое файла построчно в UTF-8.
      */
     @Test

@@ -160,6 +160,20 @@ class ConsoleInputTest {
     }
 
     /**
+     * Проверяет, что пустая строка при чтении числа отклоняется с сообщением
+     * «Пустой ввод.» и запрашивается повторный ввод.
+     */
+    @Test
+    void readIntRetriesOnEmptyInput() {
+        TestSupport.Outcome outcome = TestSupport.run("\n5\n", () -> {
+            ConsoleInput input = new ConsoleInput();
+            assertEquals(5, input.readInt("> "));
+            input.close();
+        });
+        assertTrue(outcome.output().contains("Пустой ввод."));
+    }
+
+    /**
      * Проверяет, что при окончании потока ввода бросается EndOfInputException.
      */
     @Test

@@ -6,7 +6,6 @@ import astonteam.sorting.model.Car;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
-
 /**
  * Заполняет коллекцию автомобилями со случайными характеристиками.
  */
@@ -30,7 +29,7 @@ public final class RandomFiller {
             throw new IllegalArgumentException("Размер массива должен быть больше нуля: " + size);
         }
         if (size > Limits.MAX_COLLECTION_SIZE) {
-            throw  new IllegalArgumentException("Максимальный размер массива: " + Limits.MAX_COLLECTION_SIZE);
+            throw new IllegalArgumentException("Максимальный размер массива: " + Limits.MAX_COLLECTION_SIZE);
         }
 
         CarArrayList cars = new CarArrayList();
@@ -40,7 +39,6 @@ public final class RandomFiller {
                 .forEach(cars::add);
 
         return cars;
-
     }
 
     /**
@@ -48,7 +46,7 @@ public final class RandomFiller {
      *
      * @return случайный автомобиль
      */
-    private Car generateRandomCar () {
+    private Car generateRandomCar() {
         int power = ThreadLocalRandom.current().nextInt(Limits.MIN_POWER, Limits.MAX_POWER + 1);
 
         int year = ThreadLocalRandom.current().nextInt(Limits.MIN_YEAR, Limits.MAX_YEAR + 1);
@@ -61,7 +59,4 @@ public final class RandomFiller {
                 .year(year)
                 .build();
     }
-
-
-
 }

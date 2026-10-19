@@ -1,5 +1,6 @@
 package astonteam.sorting.validation;
 
+import astonteam.sorting.common.Limits;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,5 +84,19 @@ class CarValidatorTest {
         assertEquals("мощность вне диапазона 1..2000", validator.validate(0, "A", 2000).message());
         assertEquals("модель не должна быть пустой", validator.validate(1, "", 2000).message());
         assertEquals("год вне диапазона 1886..2026", validator.validate(1, "A", 3000).message());
+    }
+
+    /**
+     * Проверяет, что модель длиннее {@link Limits#MAX_MODEL_LENGTH} символов
+     * отклоняется с понятным сообщением.
+     */
+    @Test
+    void rejectsTooLongModel() {
+        String tooLong = "A".repeat(Limits.MAX_MODEL_LENGTH + 1);
+
+        ValidationResult result = validator.validate(150, tooLong, 2015);
+
+        assertFalse(result.isValid());
+        assertTrue(result.message().contains("длиннее " + Limits.MAX_MODEL_LENGTH));
     }
 }

@@ -113,6 +113,33 @@ class FileFillerTest {
     void fillRejectsTooLongModel() throws IOException {
         Path file = tempDir.resolve("long_model.txt");
         String longModel = "A".repeat(Limits.MAX_MODEL_LENGTH + 1);
+        Files.writeString(file, "150;" + longModel + ";2015\n", StandardCharsets.UTF_8);
+
+        assertThrows(IllegalArgumentException.class, () -> new FileFiller().fill(file));
+    }
+
+    /**
+     * Проверяет, что путь к каталогу вместо файла отклоняется с IllegalArgumentException.
+     */
+    @Test
+    void fillRejectsDirectoryPath() {
+        assertThrows(IllegalArgumentException.class, () -> new FileFiller().fill(tempDir));
+    }
+
+    /**
+     * Проверяет, что файл с числом строк больше {@link Limits#MAX_COLLECTION_SIZE}
+     * отклоняется, иначе коллекция превысила бы допустимый размер.
+     *
+     * @throws IOException при подготовке входного файла
+     */
+    @Test
+    void fillRejectsTooManyLines() throws IOException {
+        Path file = tempDir.resolve("too_many.txt");
+        StringBuilder content = new StringBuilder();
+        for (int i = 0; i <= Limits.MAX_COLLECTION_SIZE; i++) {
+            content.append("150;Toyota;2015\n");
+        }
+        Files.writeString(file, content.toString(), StandardCharsets.UTF_8);
 
         assertThrows(IllegalArgumentException.class, () -> new FileFiller().fill(file));
     }
