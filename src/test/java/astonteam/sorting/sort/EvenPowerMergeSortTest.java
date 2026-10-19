@@ -11,10 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * Тесты для алгоритма {@link EvenPowerSort}: проверка сортировки только
+ * Тесты для алгоритма {@link EvenPowerMergeSort}: проверка сортировки только
  * автомобилей с чётной мощностью и сохранности остальных элементов.
  */
-class EvenPowerSortTest {
+class EvenPowerMergeSortTest {
+
     /**
      * Коллекция автомобилей, наполняемая в {@link #setUp()}.
      */
@@ -64,7 +65,7 @@ class EvenPowerSortTest {
         testCars.add(car(200, "Even-200", 2018));
         Car odd101 = testCars.get(1);
         Car odd99 = testCars.get(3);
-        new EvenPowerSort("power").sort(testCars, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(testCars, CarComparators.BY_POWER);
         assertSame(odd101, testCars.get(1));
         assertSame(odd99, testCars.get(3));
         assertEquals(100, testCars.get(0).getPower());
@@ -81,7 +82,7 @@ class EvenPowerSortTest {
     @Test
     void whenSortingEmptyCollectionThenNoException() {
         CarArrayList emptyCars = new CarArrayList();
-        new EvenPowerSort("power").sort(emptyCars, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(emptyCars, CarComparators.BY_POWER);
         assertEquals(0, emptyCars.size(),
                 "Пустая коллекция должна оставаться пустой после сортировки");
     }
@@ -94,7 +95,7 @@ class EvenPowerSortTest {
     void whenSortingSingleElementCollectionThenNoException() {
         CarArrayList singleCar = new CarArrayList();
         singleCar.add(car(150, "Solo", 2020));
-        new EvenPowerSort("power").sort(singleCar, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(singleCar, CarComparators.BY_POWER);
         assertEquals("Solo", singleCar.get(0).getModel(),
                 "Элемент коллекции должен оставаться неизменным после сортировки");
         assertEquals(2020, singleCar.get(0).getYear(),
@@ -115,7 +116,7 @@ class EvenPowerSortTest {
         for (int i = 0; i < cars.size(); i++) {
             originalCars[i] = cars.get(i);
         }
-        new EvenPowerSort("power").sort(cars, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(cars, CarComparators.BY_POWER);
         int previousEvenPower = Integer.MIN_VALUE;
         for (int i = 0; i < cars.size(); i++) {
             Car car = cars.get(i);
@@ -143,7 +144,7 @@ class EvenPowerSortTest {
         testCars.add(car(300, "C", 2022));
         testCars.add(car(200, "B", 2021));
         testCars.add(car(100, "A", 2020));
-        new EvenPowerSort("power").sort(testCars, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(testCars, CarComparators.BY_POWER);
         assertEquals(100, testCars.get(0).getPower());
         assertEquals(200, testCars.get(1).getPower());
         assertEquals(300, testCars.get(2).getPower());
@@ -160,7 +161,7 @@ class EvenPowerSortTest {
         testCars.add(car(100, "Smaller", 2021));
         testCars.add(car(200, "Second", 2022));
 
-        new EvenPowerSort("power").sort(testCars, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(testCars, CarComparators.BY_POWER);
 
         assertEquals("Smaller", testCars.get(0).getModel());
         assertEquals("First", testCars.get(1).getModel());
@@ -180,7 +181,7 @@ class EvenPowerSortTest {
         testCars.add(first);
         testCars.add(second);
 
-        new EvenPowerSort("power").sort(testCars, CarComparators.BY_POWER);
+        new EvenPowerMergeSort().sort(testCars, CarComparators.BY_POWER);
 
         assertSame(first, testCars.get(0));
         assertSame(second, testCars.get(1));
@@ -194,7 +195,7 @@ class EvenPowerSortTest {
     void whenNullComparatorThenThrowsException() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> new EvenPowerSort("power").sort(cars, null)
+                () -> new EvenPowerMergeSort().sort(cars, null)
         );
         assertEquals("comparator", exception.getMessage());
     }
@@ -207,9 +208,10 @@ class EvenPowerSortTest {
     void whenNullCollectionThenThrowsException() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> new EvenPowerSort("power")
+                () -> new EvenPowerMergeSort()
                         .sort(null, CarComparators.BY_POWER)
         );
         assertEquals("cars", exception.getMessage());
     }
+
 }
