@@ -2,10 +2,12 @@ package astonteam.sorting;
 
 import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.console.AttemptsExceededException;
+import astonteam.sorting.console.CollectionMenu;
 import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.console.CountMenu;
 import astonteam.sorting.console.EndOfInputException;
 import astonteam.sorting.console.FillMenu;
+import astonteam.sorting.console.HistoryMenu;
 import astonteam.sorting.console.Menu;
 import astonteam.sorting.console.MenuItem;
 import astonteam.sorting.console.SearchMenu;
@@ -30,11 +32,13 @@ public class Main {
         try (ConsoleInput input = new ConsoleInput()) {
             Menu menu = new Menu("Главное меню", List.of(
                     new MenuItem(1, "Заполнить коллекцию"),
-                    new MenuItem(2, "Сортировать коллекцию"),
-                    new MenuItem(3, "Поиск автомобилей"),
-                    new MenuItem(4, "Сохранить коллекцию в файл (перезапись)"),
+                    new MenuItem(2, "Показать текущую коллекцию"),
+                    new MenuItem(3, "Сортировать коллекцию"),
+                    new MenuItem(4, "Поиск автомобилей"),
                     new MenuItem(5, "Подсчитать вхождения автомобиля (многопоточно)"),
-                    new MenuItem(6, "Выход")
+                    new MenuItem(6, "Показать историю операций"),
+                    new MenuItem(7, "Сохранить коллекцию в файл (перезапись)"),
+                    new MenuItem(8, "Выход")
             ));
             boolean running = true;
             while (running) {
@@ -44,11 +48,13 @@ public class Main {
                             cars = FillMenu.fillCars(cars, input, validator, randomFiller);
                         }
                         // Передаем saver в методы
-                        case 2 -> SortingMenu.sortCars(cars, input, saver);
-                        case 3 -> SearchMenu.searchCars(cars, input, saver);
-                        case 4 -> saver.saveCollection("cars.txt", cars);
+                        case 2 -> CollectionMenu.showCollection(cars);
+                        case 3 -> SortingMenu.sortCars(cars, input, saver);
+                        case 4 -> SearchMenu.searchCars(cars, input, saver);
                         case 5 -> CountMenu.countCars(cars, input, counter);
-                        case 6 -> running = false;
+                        case 6 -> HistoryMenu.showHistory(saver);
+                        case 7 -> saver.saveCollection("cars.txt", cars);
+                        case 8 -> running = false;
                         default -> System.out.println("Пункт в работе.");
                     }
                 } catch (AttemptsExceededException | IllegalArgumentException | UncheckedIOException e) {

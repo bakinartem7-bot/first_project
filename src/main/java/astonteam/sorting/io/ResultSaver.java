@@ -135,6 +135,25 @@ public final class ResultSaver {
         return file;
     }
 
+    /**
+     * Читает текстовый файл результатов построчно.
+     *
+     * @param fileName имя файла в каталоге результатов
+     * @return строки файла; пустой список, если файл не существует
+     * @throws UncheckedIOException при ошибке чтения файла
+     */
+    public List<String> readLines(String fileName) {
+        Path file = resolveSafe(fileName);
+        if (!Files.exists(file)) {
+            return List.of();
+        }
+        try {
+            return Files.readAllLines(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Не удалось прочитать файл " + file, e);
+        }
+    }
+
     private Path resolveSafe(String fileName) {
         String name = TextSanitizer.normalize(fileName);
         if (name.isEmpty()) {

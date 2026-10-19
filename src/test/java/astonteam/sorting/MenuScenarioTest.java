@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <ul>
  *     <li>положительные сценарии — все три источника заполнения (ручной,
  *     случайный, из файла), сортировку по трём полям (мощность, модель, год),
- *     запись результата в файл и корректный выход;</li>
+ *     просмотр коллекции и истории, запись результата в файл и корректный выход;</li>
  *     <li>отрицательные сценарии — неверный ввод (нечисловое значение, номер
  *     отсутствующего пункта меню, мощность вне диапазона, неожидаемый ответ
  *     да/нет, отсутствующий файл) не должен завершать программу.</li>
@@ -90,9 +90,9 @@ class MenuScenarioTest {
                 "1", "1", "2",
                 "150", "Toyota", "2015",
                 "100", "Audi", "2018",
-                "2", "1", "1", "нет",
-                "4",
-                "6"
+                "3", "1", "1", "нет",
+                "7",
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -103,7 +103,7 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Работа завершена."));
         assertTrue(Files.exists(CARS_FILE));
         assertTrue(
-                outcome.output().indexOf("power=100") < outcome.output().indexOf("power=150"),
+                outcome.output().indexOf("Мощность: 100") < outcome.output().indexOf("Мощность: 150"),
                 "автомобили должны быть отсортированы по мощности по возрастанию"
         );
     }
@@ -116,8 +116,8 @@ class MenuScenarioTest {
     void randomSourceSortByModelAppendAndExit() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "2", "3",
-                "2", "2", "2", "да",
-                "6"
+                "3", "2", "2", "да",
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -140,8 +140,8 @@ class MenuScenarioTest {
 
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", inputFile.toString(),
-                "2", "1", "3", "нет",
-                "6"
+                "3", "1", "3", "нет",
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -149,9 +149,61 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Алгоритм: InsertionSort"));
         assertTrue(outcome.output().contains("Работа завершена."));
         assertTrue(
-                outcome.output().indexOf("year=2015") < outcome.output().indexOf("year=2018"),
+                outcome.output().indexOf("Год: 2015") < outcome.output().indexOf("Год: 2018"),
                 "автомобили должны быть отсортированы по году по возрастанию"
         );
+    }
+
+    /**
+     * Позитивный сценарий: показ текущей коллекции выводит все автомобили
+     * в читаемом виде и возвращает в главное меню.
+     */
+    @Test
+    void showCollectionPrintsCurrentCars() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "1", "2",
+                "150", "Toyota", "2015",
+                "100", "Audi", "2018",
+                "2",
+                "8"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Текущая коллекция (элементов: 2):"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2015"));
+        assertTrue(outcome.output().contains("Мощность: 100; Модель: Audi; Год: 2018"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Позитивный сценарий: после дописывания результата сортировки пункт
+     * «Показать историю» выводит содержимое history.txt.
+     */
+    @Test
+    void historyOptionAfterAppendShowsHistory() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "2", "3",
+                "3", "2", "2", "да",
+                "6",
+                "8"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("История операций (history.txt):"));
+        assertTrue(outcome.output().contains("Результат сортировки"));
+    }
+
+    /**
+     * Позитивный сценарий: при отсутствии истории пункт «Показать историю»
+     * сообщает, что история пуста, и возвращает в меню.
+     */
+    @Test
+    void historyOptionWithoutHistoryReportsEmpty() {
+        TestSupport.Outcome outcome = runMain(lines("6", "8"));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("История операций (history.txt):"));
+        assertTrue(outcome.output().contains("История пуста."));
     }
 
     /**
@@ -162,7 +214,7 @@ class MenuScenarioTest {
     void nonexistentFileReportsErrorAndReturnsToMenu() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", "no_such_file_12345.txt",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -180,11 +232,11 @@ class MenuScenarioTest {
      */
     @Test
     void invalidMenuNumberDoesNotExitProgram() {
-        TestSupport.Outcome outcome = runMain(lines("abc", "7", "5"));
+        TestSupport.Outcome outcome = runMain(lines("abc", "9", "8"));
 
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("не является целым числом"));
-        assertTrue(outcome.output().contains("Пункта меню с номером 7 нет."));
+        assertTrue(outcome.output().contains("Пункта меню с номером 9 нет."));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
 
@@ -198,7 +250,7 @@ class MenuScenarioTest {
                 "1", "1", "1",
                 "9999", "Toyota", "2015",
                 "150", "Toyota", "2015",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -216,9 +268,9 @@ class MenuScenarioTest {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "1", "1",
                 "150", "Toyota", "2015",
-                "2", "1", "1",
+                "3", "1", "1",
                 "maybe", "нет",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -236,7 +288,7 @@ class MenuScenarioTest {
                 "1", "3", "missing_file_999.txt",
                 "1", "1", "1",
                 "150", "Toyota", "2015",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -257,7 +309,7 @@ class MenuScenarioTest {
                 "150", "Toyota", "2015",
                 "100", "Audi", "2018",
                 "5", "150", "Toyota", "2015",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());

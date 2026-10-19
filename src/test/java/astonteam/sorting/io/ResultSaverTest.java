@@ -197,6 +197,34 @@ class ResultSaverTest {
         assertTrue(content.contains("Вторая запись"));
     }
 
+    /**
+     * Проверяет, что readLines читает содержимое файла построчно в UTF-8.
+     */
+    @Test
+    void readLinesReturnsFileContent() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        saver.saveCollection("history.txt", List.of(car(150, "Toyota", 2015)));
+        assertEquals(List.of("150;Toyota;2015"), saver.readLines("history.txt"));
+    }
+
+    /**
+     * Проверяет, что для отсутствующего файла readLines возвращает пустой список.
+     */
+    @Test
+    void readLinesReturnsEmptyListWhenFileMissing() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertTrue(saver.readLines("history.txt").isEmpty());
+    }
+
+    /**
+     * Проверяет, что readLines отклоняет небезопасное имя файла.
+     */
+    @Test
+    void readLinesRejectsUnsafeFileName() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class, () -> saver.readLines("../escape.txt"));
+    }
+
     //Тест на сохранение кириллицы в UTF-8
     @Test
     void saveCollectionWritesUtf8Cyrillic() throws IOException {

@@ -94,13 +94,13 @@ public final class Car {
     }
 
     /**
-     * Возвращает строковое представление автомобиля.
+     * Возвращает читаемое строковое представление автомобиля.
      *
-     * @return строка с полями автомобиля
+     * @return строка вида «Мощность: 100; Модель: Audi; Год: 2002»
      */
     @Override
     public String toString() {
-        return "Car{power=" + power + ", model='" + model + "', year=" + year + '}';
+        return "Мощность: " + power + "; Модель: " + model + "; Год: " + year;
     }
 
     /**

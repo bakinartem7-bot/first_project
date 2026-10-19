@@ -46,8 +46,8 @@ class SearchMenuTest {
         TestSupport.Outcome outcome = runSearch("1\n150\nнет\n", cars);
 
         assertNull(outcome.error());
-        assertTrue(outcome.output().contains("Car{power=150, model='Toyota', year=2021}"));
-        assertFalse(outcome.output().contains("Car{power=100, model='BMW', year=2021}"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2021"));
+        assertFalse(outcome.output().contains("Мощность: 100; Модель: BMW; Год: 2021"));
     }
 
     @Test
@@ -55,8 +55,8 @@ class SearchMenuTest {
         TestSupport.Outcome outcome = runSearch("2\nTOYOTA\nнет\n", cars);
 
         assertNull(outcome.error());
-        assertTrue(outcome.output().contains("Car{power=150, model='Toyota', year=2021}"));
-        assertTrue(outcome.output().contains("Car{power=2000, model='toyota', year=1999}"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2021"));
+        assertTrue(outcome.output().contains("Мощность: 2000; Модель: toyota; Год: 1999"));
     }
 
     @Test
@@ -64,8 +64,8 @@ class SearchMenuTest {
         TestSupport.Outcome outcome = runSearch("3\n2021\nнет\n", cars);
 
         assertNull(outcome.error());
-        assertTrue(outcome.output().contains("Car{power=150, model='Toyota', year=2021}"));
-        assertTrue(outcome.output().contains("Car{power=100, model='BMW', year=2021}"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2021"));
+        assertTrue(outcome.output().contains("Мощность: 100; Модель: BMW; Год: 2021"));
     }
 
     @Test
@@ -73,8 +73,8 @@ class SearchMenuTest {
         TestSupport.Outcome outcome = runSearch("4\n150\nTOYOTA\n2021\nнет\n", cars);
 
         assertNull(outcome.error());
-        assertTrue(outcome.output().contains("Car{power=150, model='Toyota', year=2021}"));
-        assertFalse(outcome.output().contains("Car{power=2000, model='toyota', year=1999}"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2021"));
+        assertFalse(outcome.output().contains("Мощность: 2000; Модель: toyota; Год: 1999"));
     }
 
     @Test
