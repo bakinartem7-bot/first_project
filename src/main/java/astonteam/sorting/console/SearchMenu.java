@@ -4,6 +4,7 @@ import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.io.ResultSaver;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.search.CarSearcher;
+import astonteam.sorting.common.Limits;
 
 import java.util.List;
 
@@ -45,7 +46,8 @@ public class SearchMenu {
 
         switch (searchId) {
             case 1 -> {
-                int power = input.readInt("Введите мощность: ");
+                int power = readPower(input);
+                input.markSuccess();
                 foundCars = searcher.findByPower(cars, power);
             }
             case 2 -> {
@@ -57,7 +59,7 @@ public class SearchMenu {
                 foundCars = searcher.findByYear(cars, year);
             }
             case 4 -> {
-                int power = input.readInt("Введите мощность: ");
+                int power = readPower(input);
                 String model = input.readNonBlank("Введите модель: ");
                 int year = input.readInt("Введите год выпуска: ");
 
@@ -66,7 +68,7 @@ public class SearchMenu {
                         .model(model)
                         .year(year)
                         .build();
-
+                input.markSuccess();
                 foundCars = searcher.findWholeCar(cars, target);
             }
             case 5 -> {
@@ -83,6 +85,36 @@ public class SearchMenu {
             if (input.readYesNo("Дописать найденные автомобили в файл history.txt?")) {
                 saver.appendCollection("history.txt", foundCars, "Результат поиска");
             }
+        }
+    }
+
+    /**
+     * Запрашивает мощность автомобиля и повторяет ввод, пока значение
+     * не попадёт в допустимый диапазон.
+     *
+     * @param input источник консольного ввода
+     * @return корректная мощность автомобиля
+     * @throws AttemptsExceededException если достигнут предел неудачных попыток
+     * @throws EndOfInputException если поток ввода завершён
+     */
+    private static int readPower(ConsoleInput input) {
+        while (true) {
+            int power = input.readInt("Введите мощность: ");
+
+            if (power < 0) {
+                input.reportError("Мощность не может быть отрицательной.");
+                continue;
+            }
+
+            if (power < Limits.MIN_POWER || power > Limits.MAX_POWER) {
+                input.reportError(
+                        "Мощность должна быть в диапазоне от "
+                                + Limits.MIN_POWER + " до " + Limits.MAX_POWER + "."
+                );
+                continue;
+            }
+
+            return power;
         }
     }
 

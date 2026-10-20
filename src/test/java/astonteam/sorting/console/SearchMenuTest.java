@@ -171,4 +171,30 @@ class SearchMenuTest {
         assertNull(outcome.error());
         assertFalse(outcome.output().contains("Найденные автомобили:"));
     }
+
+    @Test
+    void whenPowerIsNegativeThenPrintsErrorAndRequestsPowerAgain() {
+        CarArrayList cars = new CarArrayList();
+        cars.add(Car.builder()
+                .power(100)
+                .model("Bmw")
+                .year(2021)
+                .build());
+
+        TestSupport.Outcome outcome = TestSupport.run(
+                "1\n-100\n100\nнет\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SearchMenu.searchCars(cars, input, new ResultSaver());
+                    }
+                }
+        );
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains(
+                "Мощность не может быть отрицательной."
+        ));
+        assertTrue(outcome.output().contains("Найденные автомобили:"));
+        assertTrue(outcome.output().contains("Мощность: 100"));
+    }
 }
