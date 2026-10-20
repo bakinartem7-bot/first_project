@@ -1,6 +1,7 @@
 package astonteam.sorting.console;
 
 import astonteam.sorting.collection.CarArrayList;
+import astonteam.sorting.common.TextSanitizer;
 import astonteam.sorting.io.ResultSaver;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.search.CarSearcher;
@@ -51,18 +52,19 @@ public class SearchMenu {
                 foundCars = searcher.findByPower(cars, power);
             }
             case 2 -> {
-                String model = input.readNonBlank("Введите модель: ");
+                String model = readModel(input);
+                input.markSuccess();
                 foundCars = searcher.findByModel(cars, model);
             }
             case 3 -> {
-                int year = input.readInt("Введите год выпуска: ");
+                int year = readYear(input);
+                input.markSuccess();
                 foundCars = searcher.findByYear(cars, year);
             }
             case 4 -> {
                 int power = readPower(input);
-                String model = input.readNonBlank("Введите модель: ");
-                int year = input.readInt("Введите год выпуска: ");
-
+                String model = readModel(input);
+                int year = readYear(input);
                 Car target = Car.builder()
                         .power(power)
                         .model(model)
@@ -100,12 +102,10 @@ public class SearchMenu {
     private static int readPower(ConsoleInput input) {
         while (true) {
             int power = input.readInt("Введите мощность: ");
-
             if (power < 0) {
                 input.reportError("Мощность не может быть отрицательной.");
                 continue;
             }
-
             if (power < Limits.MIN_POWER || power > Limits.MAX_POWER) {
                 input.reportError(
                         "Мощность должна быть в диапазоне от "
@@ -113,8 +113,61 @@ public class SearchMenu {
                 );
                 continue;
             }
-
             return power;
+        }
+    }
+
+    /**
+     * Запрашивает модель до получения корректного значения.
+     *
+     * @param input источник консольного ввода
+     * @return корректное название модели
+     * @throws AttemptsExceededException если достигнут предел ошибок
+     * @throws EndOfInputException если ввод завершён
+     */
+    private static String readModel(ConsoleInput input) {
+        while (true) {
+            String model = input.readLine("Введите модель: ");
+            if (model.isBlank()) {
+                input.reportError("Модель не должна быть пустой.");
+                continue;
+            }
+            if (model.length() > Limits.MAX_MODEL_LENGTH) {
+                input.reportError("Модель не должна быть длиннее " + Limits.MAX_MODEL_LENGTH + " символов." );
+                continue;
+            }
+            if (model.indexOf(';') >= 0) {
+                input.reportError("Модель не должна содержать символ «;».");
+                continue;
+            }
+            if (TextSanitizer.hasControlChars(model)) {
+                input.reportError("Модель не должна содержать управляющие символы.");
+                continue;
+            }
+            return model;
+        }
+    }
+
+    /**
+     * Запрашивает год выпуска до получения значения
+     * из допустимого диапазона.
+     *
+     * @param input источник консольного ввода
+     * @return корректный год выпуска
+     * @throws AttemptsExceededException если достигнут предел ошибок
+     * @throws EndOfInputException если ввод завершён
+     */
+    private static int readYear(ConsoleInput input) {
+        while (true) {
+            int year = input.readInt("Введите год выпуска: ");
+            if (year < Limits.MIN_YEAR || year > Limits.MAX_YEAR) {
+                input.reportError(
+                        "Год выпуска должен быть в диапазоне от "
+                                + Limits.MIN_YEAR + " до " + Limits.MAX_YEAR + "."
+                );
+                continue;
+            }
+            return year;
         }
     }
 
@@ -128,7 +181,6 @@ public class SearchMenu {
             System.out.println("Совпадений не найдено.");
             return;
         }
-
         System.out.println("Найденные автомобили:");
         for (Car car : foundCars) {
             System.out.println(car);
