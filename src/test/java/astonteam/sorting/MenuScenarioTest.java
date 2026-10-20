@@ -252,20 +252,20 @@ class MenuScenarioTest {
     }
 
     /**
-     * Отрицательный сценарий: мощность вне диапазона отклоняется, после чего
-     * принимается корректный автомобиль и программа завершается нормально.
+     * Проверяет, что мощность вне допустимого диапазона отклоняется,
+     * после чего повторно запрашивается только поле мощности.
+     * После корректного ввода автомобиль добавляется в коллекцию.
      */
     @Test
-    void invalidManualPowerRejectedThenValid() {
+    void invalidManualPowerRetriesOnlyPowerField() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "1", "1",
-                "9999", "Toyota", "2015",
+                "9999",
                 "150", "Toyota", "2015",
                 "8"
         ));
-
         assertNull(outcome.error());
-        assertTrue(outcome.output().contains("мощность вне диапазона"));
+        assertTrue(outcome.output().contains("Мощность должна быть в диапазоне"));
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
