@@ -88,6 +88,16 @@ class CarTest {
     }
 
     /**
+     * Проверяет, что строковое представление автомобиля читаемо
+     * и содержит все поля в ожидаемом формате.
+     */
+    @Test
+    void toStringUsesReadableFormat() {
+        Car car = Car.builder().power(100).model("Audi").year(2002).build();
+        assertEquals("Мощность: 100; Модель: Audi; Год: 2002", car.toString());
+    }
+
+    /**
      * Проверяет, что равные по значению, но разные экземпляры автомобилей
      * равны и имеют одинаковый hashCode.
      */

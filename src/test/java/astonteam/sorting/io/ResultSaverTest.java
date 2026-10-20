@@ -182,22 +182,48 @@ class ResultSaverTest {
         ResultSaver saver = new ResultSaver(directory);
         Path file = directory.resolve("history.txt");
 
-        // Первая запись
         saver.appendCollection("history.txt", List.of(car(150, "Toyota", 2015)), "Первая запись");
-
-        // Вторая запись (дописывание)
         saver.appendCollection("history.txt", List.of(car(90, "BMW", 2010)), "Вторая запись");
 
         String content = Files.readString(file, StandardCharsets.UTF_8);
 
-        // Проверяем, что обе записи присутствуют в файле
         assertTrue(content.contains("Toyota"));
         assertTrue(content.contains("BMW"));
         assertTrue(content.contains("Первая запись"));
         assertTrue(content.contains("Вторая запись"));
     }
 
-    //Тест на сохранение кириллицы в UTF-8
+    /**
+     * Проверяет, что readLines читает содержимое файла построчно в UTF-8.
+     */
+    @Test
+    void readLinesReturnsFileContent() throws IOException {
+        ResultSaver saver = new ResultSaver(directory);
+        saver.saveCollection("history.txt", List.of(car(150, "Toyota", 2015)));
+        assertEquals(List.of("150;Toyota;2015"), saver.readLines("history.txt"));
+    }
+
+    /**
+     * Проверяет, что для отсутствующего файла readLines возвращает пустой список.
+     */
+    @Test
+    void readLinesReturnsEmptyListWhenFileMissing() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertTrue(saver.readLines("history.txt").isEmpty());
+    }
+
+    /**
+     * Проверяет, что readLines отклоняет небезопасное имя файла.
+     */
+    @Test
+    void readLinesRejectsUnsafeFileName() {
+        ResultSaver saver = new ResultSaver(directory);
+        assertThrows(IllegalArgumentException.class, () -> saver.readLines("../escape.txt"));
+    }
+
+    /**
+     * Проверяет, что модель с кириллицей сохраняется в файл в кодировке UTF-8.
+     */
     @Test
     void saveCollectionWritesUtf8Cyrillic() throws IOException {
         ResultSaver saver = new ResultSaver(directory);

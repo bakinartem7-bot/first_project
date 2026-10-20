@@ -16,6 +16,12 @@ import java.util.Locale;
  */
 public final class ConsoleInput implements AutoCloseable {
 
+    /**
+     * Создаёт источник ввода, читающий стандартный поток ввода в UTF-8.
+     */
+    public ConsoleInput() {
+    }
+
     /** Поток чтения символов из стандартного ввода. */
     private final BufferedReader reader =
             new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));

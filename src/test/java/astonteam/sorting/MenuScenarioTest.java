@@ -1,6 +1,8 @@
 package astonteam.sorting;
 
+import astonteam.sorting.io.ResultSaver;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <ul>
  *     <li>положительные сценарии — все три источника заполнения (ручной,
  *     случайный, из файла), сортировку по трём полям (мощность, модель, год),
- *     запись результата в файл и корректный выход;</li>
+ *     просмотр коллекции и истории, запись результата в файл и корректный выход;</li>
  *     <li>отрицательные сценарии — неверный ввод (нечисловое значение, номер
  *     отсутствующего пункта меню, мощность вне диапазона, неожидаемый ответ
  *     да/нет, отсутствующий файл) не должен завершать программу.</li>
@@ -30,34 +32,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MenuScenarioTest {
 
-    /** Каталог результатов, используемый {@link astonteam.sorting.io.ResultSaver} по умолчанию. */
-    private static final Path RESULTS = Path.of("results");
-    /** Файл, в который пишет пункт меню «Сохранить коллекцию». */
-    private static final Path CARS_FILE = RESULTS.resolve("cars.txt");
-    /** Файл, в который дописываются результаты сортировки и поиска. */
-    private static final Path HISTORY_FILE = RESULTS.resolve("history.txt");
-
-    /** Временный каталог для входного файла сценария «заполнить из файла». */
+    /** Временный каталог: сюда будут писать все тестовые сценарии, а не в настоящий {@code results/}. */
     @TempDir
     Path tempDir;
 
     /**
-     * Удаляет сгенерированные сценариями файлы, чтобы тесты не оставляли мусор,
-     * и убирает каталог результатов, если он стал пустым.
-     *
-     * @throws IOException при ошибке работы с файловой системой
+     * Перенаправляет каталог результатов во временный каталог,
+     * чтобы тесты не перезаписывали и не удаляли реальные данные.
+     */
+    @BeforeEach
+    void useTemporaryResultsDirectory() {
+        System.setProperty(ResultSaver.RESULTS_DIRECTORY_PROPERTY, tempDir.toString());
+    }
+
+    /**
+     * Возвращает систему в исходное состояние после теста.
      */
     @AfterEach
-    void cleanupGeneratedFiles() throws IOException {
-        Files.deleteIfExists(CARS_FILE);
-        Files.deleteIfExists(HISTORY_FILE);
-        if (Files.isDirectory(RESULTS)) {
-            try (var entries = Files.list(RESULTS)) {
-                if (entries.findAny().isEmpty()) {
-                    Files.delete(RESULTS);
-                }
-            }
-        }
+    void resetResultsDirectory() {
+        System.clearProperty(ResultSaver.RESULTS_DIRECTORY_PROPERTY);
+    }
+
+    /**
+     * Файл, в который пишет пункт меню «Сохранить коллекцию».
+     *
+     * @return путь к файлу коллекции во временном каталоге
+     */
+    private Path carsFile() {
+        return tempDir.resolve("cars.txt");
+    }
+
+    /**
+     * Файл, в который дописываются результаты сортировки и поиска.
+     *
+     * @return путь к журналу операций во временном каталоге
+     */
+    private Path historyFile() {
+        return tempDir.resolve("history.txt");
     }
 
     /**
@@ -90,9 +101,9 @@ class MenuScenarioTest {
                 "1", "1", "2",
                 "150", "Toyota", "2015",
                 "100", "Audi", "2018",
-                "2", "1", "1", "нет",
-                "4",
-                "6"
+                "3", "1", "1", "нет",
+                "7", "да",
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -101,9 +112,9 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Алгоритм: InsertionSort"));
         assertTrue(outcome.output().contains("Файл сохранён"));
         assertTrue(outcome.output().contains("Работа завершена."));
-        assertTrue(Files.exists(CARS_FILE));
+        assertTrue(Files.exists(carsFile()));
         assertTrue(
-                outcome.output().indexOf("power=100") < outcome.output().indexOf("power=150"),
+                outcome.output().indexOf("Мощность: 100") < outcome.output().indexOf("Мощность: 150"),
                 "автомобили должны быть отсортированы по мощности по возрастанию"
         );
     }
@@ -116,8 +127,8 @@ class MenuScenarioTest {
     void randomSourceSortByModelAppendAndExit() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "2", "3",
-                "2", "2", "2", "да",
-                "6"
+                "3", "2", "2", "да",
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -125,7 +136,7 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Алгоритм: MergeSort"));
         assertTrue(outcome.output().contains("Данные успешно дописаны в файл"));
         assertTrue(outcome.output().contains("Работа завершена."));
-        assertTrue(Files.exists(HISTORY_FILE));
+        assertTrue(Files.exists(historyFile()));
     }
 
     /**
@@ -140,8 +151,8 @@ class MenuScenarioTest {
 
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", inputFile.toString(),
-                "2", "1", "3", "нет",
-                "6"
+                "3", "1", "3", "нет",
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -149,9 +160,61 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Алгоритм: InsertionSort"));
         assertTrue(outcome.output().contains("Работа завершена."));
         assertTrue(
-                outcome.output().indexOf("year=2015") < outcome.output().indexOf("year=2018"),
+                outcome.output().indexOf("Год: 2015") < outcome.output().indexOf("Год: 2018"),
                 "автомобили должны быть отсортированы по году по возрастанию"
         );
+    }
+
+    /**
+     * Позитивный сценарий: показ текущей коллекции выводит все автомобили
+     * в читаемом виде и возвращает в главное меню.
+     */
+    @Test
+    void showCollectionPrintsCurrentCars() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "1", "2",
+                "150", "Toyota", "2015",
+                "100", "Audi", "2018",
+                "2",
+                "8"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Текущая коллекция (элементов: 2):"));
+        assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2015"));
+        assertTrue(outcome.output().contains("Мощность: 100; Модель: Audi; Год: 2018"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Позитивный сценарий: после дописывания результата сортировки пункт
+     * «Показать историю» выводит содержимое history.txt.
+     */
+    @Test
+    void historyOptionAfterAppendShowsHistory() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "2", "3",
+                "3", "2", "2", "да",
+                "6",
+                "8"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("История операций (history.txt):"));
+        assertTrue(outcome.output().contains("Результат сортировки"));
+    }
+
+    /**
+     * Позитивный сценарий: при отсутствии истории пункт «Показать историю»
+     * сообщает, что история пуста, и возвращает в меню.
+     */
+    @Test
+    void historyOptionWithoutHistoryReportsEmpty() {
+        TestSupport.Outcome outcome = runMain(lines("6", "8"));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("История операций (history.txt):"));
+        assertTrue(outcome.output().contains("История пуста."));
     }
 
     /**
@@ -162,7 +225,7 @@ class MenuScenarioTest {
     void nonexistentFileReportsErrorAndReturnsToMenu() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "3", "no_such_file_12345.txt",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -180,11 +243,11 @@ class MenuScenarioTest {
      */
     @Test
     void invalidMenuNumberDoesNotExitProgram() {
-        TestSupport.Outcome outcome = runMain(lines("abc", "7", "5"));
+        TestSupport.Outcome outcome = runMain(lines("abc", "9", "8"));
 
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("не является целым числом"));
-        assertTrue(outcome.output().contains("Пункта меню с номером 7 нет."));
+        assertTrue(outcome.output().contains("Пункта меню с номером 9 нет."));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
 
@@ -198,7 +261,7 @@ class MenuScenarioTest {
                 "1", "1", "1",
                 "9999", "Toyota", "2015",
                 "150", "Toyota", "2015",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -216,9 +279,9 @@ class MenuScenarioTest {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "1", "1",
                 "150", "Toyota", "2015",
-                "2", "1", "1",
+                "3", "1", "1",
                 "maybe", "нет",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -236,7 +299,7 @@ class MenuScenarioTest {
                 "1", "3", "missing_file_999.txt",
                 "1", "1", "1",
                 "150", "Toyota", "2015",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
@@ -257,12 +320,63 @@ class MenuScenarioTest {
                 "150", "Toyota", "2015",
                 "100", "Audi", "2018",
                 "5", "150", "Toyota", "2015",
-                "6"
+                "8"
         ));
 
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Автомобилей введено: 3"));
         assertTrue(outcome.output().contains("Количество вхождений в коллекцию: 2"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+    }
+
+    /**
+     * Отрицательный сценарий: отказ от перезаписи (ответ «нет») оставляет
+     * файл результата несозданным.
+     */
+    @Test
+    void saveDeclinedLeavesFileUntouched() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "1", "1",
+                "150", "Toyota", "2015",
+                "7", "нет",
+                "8"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Сохранение отменено."));
+        assertFalse(Files.exists(carsFile()));
+    }
+
+    /**
+     * Отрицательный сценарий: сохранение пустой коллекции запрещено —
+     * файл не создаётся, программа продолжает работать.
+     */
+    @Test
+    void saveOfEmptyCollectionIsRefused() {
+        TestSupport.Outcome outcome = runMain(lines("7", "8"));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Коллекция пуста"));
+        assertTrue(outcome.output().contains("Работа завершена."));
+        assertFalse(Files.exists(carsFile()));
+    }
+
+    /**
+     * Отрицательный сценарий: модель с символом «;» отклоняется ещё при вводе,
+     * так как этот символ является разделителем полей в файле.
+     */
+    @Test
+    void modelWithFileDelimiterIsRejectedAtInput() {
+        TestSupport.Outcome outcome = runMain(lines(
+                "1", "1", "1",
+                "150", "Toyota;Corolla", "2015",
+                "150", "Toyota", "2015",
+                "8"
+        ));
+
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("не должна содержать символ"));
+        assertTrue(outcome.output().contains("Автомобилей введено: 1"));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
 }

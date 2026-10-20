@@ -14,7 +14,24 @@ import astonteam.sorting.stats.SortingStatistics;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Консольное меню выбора алгоритма и поля сортировки коллекции автомобилей.
+ */
 public class SortingMenu {
+
+    /**
+     * Приватный конструктор для запрета создания экземпляров утилитного класса.
+     */
+    private SortingMenu() {
+    }
+
+    /**
+     * Запрашивает параметры сортировки, сортирует коллекцию, выводит статистику и предлагает сохранить результат.
+     *
+     * @param cars  рабочая коллекция автомобилей
+     * @param input источник консольного ввода
+     * @param saver сервис записи результата в файл
+     */
     public static void sortCars(CarArrayList cars, ConsoleInput input, ResultSaver saver) {
         if (cars.size() == 0) {
             System.out.println("Сначала заполните коллекцию автомобилями.");

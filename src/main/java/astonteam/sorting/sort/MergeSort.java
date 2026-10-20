@@ -147,7 +147,7 @@ public class MergeSort implements SortStrategy {
          */
         private long comparisons;
 
-        // Число позиций, в которых после слияния изменился объект
+        /** Счётчик изменений позиций при слиянии. */
         private long swaps;
     }
 }

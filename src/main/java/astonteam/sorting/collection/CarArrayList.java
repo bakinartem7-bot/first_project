@@ -11,6 +11,12 @@ import java.util.Objects;
  */
 public class CarArrayList implements Iterable<Car> {
 
+    /**
+     * Создаёт пустую коллекцию с начальной ёмкостью по умолчанию.
+     */
+    public CarArrayList() {
+    }
+
     /** Начальная ёмкость массива. */
     private static final int INITIAL_CAPACITY = 10;
 

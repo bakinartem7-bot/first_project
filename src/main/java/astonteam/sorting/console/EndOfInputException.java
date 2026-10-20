@@ -5,6 +5,7 @@ package astonteam.sorting.console;
  */
 public final class EndOfInputException extends RuntimeException {
 
+    /** Идентификатор версии сериализации. */
     private static final long serialVersionUID = 1L;
 
     /** Создаёт исключение с сообщением о закрытии потока ввода. */
