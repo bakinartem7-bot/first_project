@@ -118,7 +118,18 @@ class CarLineFormatTest {
      */
     @Test
     void parseRejectsTooManyParts() {
-        assertThrows(IllegalArgumentException.class, () -> CarLineFormat.parse("150;Toyota;Corolla;2015"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> CarLineFormat.parse("150;Toyota;Corolla;2015")
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> CarLineFormat.parse("150;Toyota;2015;")
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> CarLineFormat.parse("150;Toyota;2015;;")
+        );
     }
 
     /**
