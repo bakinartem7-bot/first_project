@@ -30,7 +30,7 @@ public class SearchMenu {
             System.out.println("Сначала заполните коллекцию автомобилями.");
             return;
         }
-
+        CarInputReader carInputReader = new CarInputReader(input);
         Menu searchMenu = new Menu("Выберите вариант поиска", List.of(
                 new MenuItem(1, "Поиск по мощности"),
                 new MenuItem(2, "Поиск по модели"),
@@ -45,28 +45,20 @@ public class SearchMenu {
 
         switch (searchId) {
             case 1 -> {
-                int power = input.readInt("Введите мощность: ");
+                int power = carInputReader.readPower();
                 foundCars = searcher.findByPower(cars, power);
             }
             case 2 -> {
-                String model = input.readNonBlank("Введите модель: ");
+                String model = carInputReader.readModel();
                 foundCars = searcher.findByModel(cars, model);
             }
             case 3 -> {
-                int year = input.readInt("Введите год выпуска: ");
+                int year = carInputReader.readYear();
                 foundCars = searcher.findByYear(cars, year);
             }
             case 4 -> {
-                int power = input.readInt("Введите мощность: ");
-                String model = input.readNonBlank("Введите модель: ");
-                int year = input.readInt("Введите год выпуска: ");
-
-                Car target = Car.builder()
-                        .power(power)
-                        .model(model)
-                        .year(year)
-                        .build();
-
+                System.out.println("Введите данные автомобиля:");
+                Car target = carInputReader.readCar();
                 foundCars = searcher.findWholeCar(cars, target);
             }
             case 5 -> {
@@ -78,7 +70,6 @@ public class SearchMenu {
         }
         printResults(foundCars);
 
-        // Задача 15: Предлагаем дописать результаты поиска в файл
         if (foundCars.size() > 0) {
             if (input.readYesNo("Дописать найденные автомобили в файл history.txt?")) {
                 saver.appendCollection("history.txt", foundCars, "Результат поиска");
@@ -96,7 +87,6 @@ public class SearchMenu {
             System.out.println("Совпадений не найдено.");
             return;
         }
-
         System.out.println("Найденные автомобили:");
         for (Car car : foundCars) {
             System.out.println(car);

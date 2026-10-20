@@ -79,7 +79,8 @@ Linux/macOS:
 
 1. Заполнить вручную — запрашивается количество, затем для каждого автомобиля
    по порядку вводятся мощность, модель и год (`ManualFiller`,
-   `IntStream.rangeClosed`);
+   `IntStream.rangeClosed`, централизованный ввод и валидация полей —
+   `console.CarInputReader`, при ошибке повторяется только неверное поле);
 2. Заполнить случайно — запрашивается количество, автомобили генерируются
    случайно (`fill.RandomFiller`, `IntStream.range`);
 3. Заполнить из файла — запрашивается путь к файлу (`fill.FileFiller`,
@@ -161,7 +162,7 @@ Linux/macOS:
 | `collection` | `CarArrayList` | собственная коллекция на массиве (`Iterable<Car>`) |
 | `validation` | `CarValidator`, `ValidationResult` | проверка полей автомобиля |
 | `common` | `Limits`, `TextSanitizer` | лимиты и нормализация текста |
-| `console` | `ConsoleInput`, `Menu`, `MenuItem`, `FillMenu`, `SortingMenu`, `SearchMenu`, `CollectionMenu`, `HistoryMenu`, `CountMenu`, `AttemptsExceededException`, `EndOfInputException` | консольный ввод и меню |
+| `console` | `ConsoleInput`, `Menu`, `MenuItem`, `CarInputReader`, `FillMenu`, `SortingMenu`, `SearchMenu`, `CollectionMenu`, `HistoryMenu`, `CountMenu`, `AttemptsExceededException`, `EndOfInputException` | консольный ввод и меню |
 | `fill` | `ManualFiller`, `RandomFiller`, `FileFiller` | источники заполнения коллекции |
 | `sort` | `SortStrategy`, `InsertionSort`, `MergeSort`, `EvenPowerInsertionSort`, `EvenPowerMergeSort`, `CarComparators` | алгоритмы сортировки и компараторы |
 | `search` | `CarSearcher`, `CarCounter` | поиск и многопоточный подсчёт автомобилей |
@@ -172,9 +173,12 @@ Linux/macOS:
 
 - нечисловое значение, пустая строка, строка длиннее 256 символов или ответ,
   не являющийся «да/нет», повторяют запрос и **не завершают программу**;
-- после 5 подряд неудачных попыток срабатывает `AttemptsExceededException` —
+- при накоплении 5 ошибок во время ввода одного автомобиля
+  срабатывает `AttemptsExceededException` —
   программа выводит ошибку и возвращается в меню;
-- некорректные данные автомобиля отклоняются, ввод автомобиля повторяется;
+- после успешного создания
+  автомобиля счётчик ошибок сбрасывается;
+- некорректные данные автомобиля отклоняются, повторяется только неверное поле;
   модель не может содержать `;` (разделитель полей файла) и управляющие
   символы — иначе сохранение всей коллекции было бы невозможно;
 - ошибки загрузки/сохранения файла перехватываются в `Main` — выводится
@@ -185,7 +189,7 @@ Linux/macOS:
 ## Тесты
 
 JUnit 5 (`junit-bom 5.11.4`), запуск через `./gradlew test`.
-Покрыто **27 тестовых классов, 256 тестов**: валидация, модель, коллекция,
+Покрыто **29 тестовых классов, 284 теста**: валидация, модель, коллекция,
 консольный ввод и меню, все источники заполнения, формат строки, сохранение
 (включая APPEND и UTF-8), сортировки по всем полям, поиск, статистика,
 сквозные сценарии `Main` (`MainTest`, `MenuScenarioTest`).

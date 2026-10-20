@@ -2,12 +2,11 @@ package astonteam.sorting.fill;
 
 import astonteam.sorting.collection.CarArrayList;
 import astonteam.sorting.common.Limits;
+import astonteam.sorting.console.CarInputReader;
 import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.validation.CarValidator;
-import astonteam.sorting.validation.ValidationResult;
 
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 /**
@@ -22,24 +21,21 @@ public final class ManualFiller {
     /** Подпись поля запроса года производства. */
     private static final String YEAR_LABEL = "  Год производства: ";
 
-    /** Источник ввода из консоли. */
-    private final ConsoleInput input;
-    /** Валидатор введённых данных автомобиля. */
-    private final CarValidator validator;
+    private final CarInputReader carInputReader;
 
     /**
      * Создаёт заполнитель.
      *
-     * @param input    источник консольного ввода
-     * @param validator валидатор автомобилей
+     * @param input     источник консольного ввода
+     * @param validator валидатор полей автомобиля
      */
     public ManualFiller(ConsoleInput input, CarValidator validator) {
-        this.input = Objects.requireNonNull(input, "input");
-        this.validator = Objects.requireNonNull(validator, "validator");
+        this.carInputReader = new CarInputReader(input, validator);
     }
 
     /**
-     * Запрашивает у пользователя указанное число автомобилей.
+     * Запрашивает у пользователя указанное число автомобилей
+     * и заполняет коллекцию через последовательный stream.
      *
      * @param size количество автомобилей для ввода
      * @return заполненная коллекция автомобилей
@@ -67,96 +63,11 @@ public final class ManualFiller {
      * @return созданный автомобиль
      */
     private Car readCar(int index) {
-        while (true) {
-            System.out.printf("Автомобиль %d:%n", index);
-            int power = readIntField(POWER_LABEL, "мощность");
-            String model = readModelField(MODEL_LABEL);
-            int year = readIntField(YEAR_LABEL, "год производства");
-            Car car = validateAndBuild(power, model, year);
-            if (car != null) {
-                input.markSuccess();
-                return car;
-            }
-            System.out.println("Повторите ввод автомобиля.");
-        }
-    }
-
-    /**
-     * Считывает целочисленное поле, повторяя ввод при ошибке.
-     *
-     * @param label     подпись для приглашения ввода
-     * @param fieldName имя поля для сообщений об ошибке
-     * @return введённое целое число
-     */
-    private int readIntField(String label, String fieldName) {
-        while (true) {
-            String line = input.readLine(label);
-            if (line.isEmpty()) {
-                input.reportError("Поле \"" + fieldName + "\" не должно быть пустым.");
-                continue;
-            }
-            try {
-                return Integer.parseInt(line);
-            } catch (NumberFormatException e) {
-                input.reportError("Поле \"" + fieldName + "\" должно быть целым числом, получено \"" + line + "\".");
-            }
-        }
-    }
-
-    /**
-     * Считывает модель, проверяя её на пустоту и длину.
-     *
-     * @param label подпись для приглашения ввода
-     * @return введённая модель
-     */
-    private String readModelField(String label) {
-        while (true) {
-            String line = input.readLine(label);
-            if (line.isEmpty()) {
-                input.reportError("Модель не должна быть пустой.");
-                continue;
-            }
-            if (line.length() > Limits.MAX_MODEL_LENGTH) {
-                input.reportError("Модель длиннее " + Limits.MAX_MODEL_LENGTH + " символов.");
-                continue;
-            }
-            return line;
-        }
-    }
-
-    /**
-     * Проверяет данные и создаёт автомобиль, сообщая об ошибках.
-     *
-     * @param power мощность автомобиля
-     * @param model модель автомобиля
-     * @param year  год производства
-     * @return созданный автомобиль или null при ошибке валидации
-     */
-    private Car validateAndBuild(int power, String model, int year) {
-        ValidationResult result;
-        try {
-            result = validator.validate(power, model, year);
-        } catch (RuntimeException e) {
-            input.reportError("Ошибка валидации: " + e.getMessage());
-            return null;
-        }
-        if (result == null) {
-            input.reportError("Валидатор вернул пустой результат.");
-            return null;
-        }
-        if (!result.isValid()) {
-            input.reportError("Данные отклонены: " + result.message());
-            return null;
-        }
-        try {
-            return Car.builder()
-                    .power(power)
-                    .model(model)
-                    .year(year)
-                    .build();
-        } catch (RuntimeException e) {
-            input.reportError("Не удалось создать автомобиль: " + e.getMessage());
-            return null;
-        }
+        System.out.printf("Автомобиль %d:%n", index);
+        return carInputReader.readCar(
+                POWER_LABEL,
+                MODEL_LABEL,
+                YEAR_LABEL
+        );
     }
 }

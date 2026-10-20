@@ -32,80 +32,112 @@ public class SortingMenu {
      * @param input источник консольного ввода
      * @param saver сервис записи результата в файл
      */
-    public static void sortCars(CarArrayList cars, ConsoleInput input, ResultSaver saver) {
+    public static void sortCars(
+            CarArrayList cars,
+            ConsoleInput input,
+            ResultSaver saver
+    ) {
         if (cars.size() == 0) {
             System.out.println("Сначала заполните коллекцию автомобилями.");
             return;
         }
 
-        String sortField;
-        Comparator<Car> comparator;
+        while (true) {
+            String sortField;
+            Comparator<Car> comparator;
 
-        Menu algorithmMenu = new Menu("Выберите алгоритм сортировки", List.of(
-                new MenuItem(1, "Сортировка вставками"),
-                new MenuItem(2, "Сортировка слиянием"),
-                new MenuItem(3, "Сортировка вставками (чётная мощность)"),
-                new MenuItem(4, "Сортировка слиянием (чётная мощность)")
-        ));
-        int algorithmId = algorithmMenu.ask(input).id();
+            Menu algorithmMenu = new Menu(
+                    "Выберите алгоритм сортировки",
+                    List.of(
+                            new MenuItem(1, "Сортировка вставками"),
+                            new MenuItem(2, "Сортировка слиянием"),
+                            new MenuItem(3, "Сортировка вставками (чётная мощность)"),
+                            new MenuItem(4, "Сортировка слиянием (чётная мощность)"),
+                            new MenuItem(5, "Назад в главное меню")
+                    )
+            );
 
-        if (algorithmId == 3 || algorithmId == 4) {
-            sortField = "power";
-            comparator = CarComparators.BY_POWER;
-        } else {
-            Menu fieldMenu = new Menu("Выберите поле сортировки", List.of(
-                    new MenuItem(1, "Мощность"),
-                    new MenuItem(2, "Модель"),
-                    new MenuItem(3, "Год выпуска")
-            ));
-            int fieldId = fieldMenu.ask(input).id();
-            switch (fieldId) {
-                case 1 -> {
-                    sortField = "power";
-                    comparator = CarComparators.BY_POWER;
+            int algorithmId = algorithmMenu.ask(input).id();
+
+            if (algorithmId == 5) {
+                return;
+            }
+
+            if (algorithmId == 3 || algorithmId == 4) {
+                sortField = "power";
+                comparator = CarComparators.BY_POWER;
+            } else {
+                Menu fieldMenu = new Menu(
+                        "Выберите поле сортировки",
+                        List.of(
+                                new MenuItem(1, "Мощность"),
+                                new MenuItem(2, "Модель"),
+                                new MenuItem(3, "Год выпуска"),
+                                new MenuItem(4, "Назад к выбору алгоритма")
+                        )
+                );
+
+                int fieldId = fieldMenu.ask(input).id();
+
+                if (fieldId == 4) {
+                    continue;
                 }
-                case 2 -> {
-                    sortField = "model";
-                    comparator = CarComparators.BY_MODEL;
+
+                switch (fieldId) {
+                    case 1 -> {
+                        sortField = "power";
+                        comparator = CarComparators.BY_POWER;
+                    }
+                    case 2 -> {
+                        sortField = "model";
+                        comparator = CarComparators.BY_MODEL;
+                    }
+                    case 3 -> {
+                        sortField = "year";
+                        comparator = CarComparators.BY_YEAR;
+                    }
+                    default -> throw new IllegalArgumentException(
+                            "Неизвестное поле сортировки: " + fieldId
+                    );
                 }
-                case 3 -> {
-                    sortField = "year";
-                    comparator = CarComparators.BY_YEAR;
-                }
+            }
+
+            SortStrategy strategy = switch (algorithmId) {
+                case 1 -> new InsertionSort(sortField);
+                case 2 -> new MergeSort(sortField);
+                case 3 -> new EvenPowerInsertionSort();
+                case 4 -> new EvenPowerMergeSort();
                 default -> throw new IllegalArgumentException(
-                        "Неизвестное поле сортировки: " + fieldId
+                        "Неизвестный алгоритм сортировки: " + algorithmId
+                );
+            };
+
+            SortingStatistics statistics = strategy.sort(cars, comparator);
+
+            System.out.println("Сортировка завершена.");
+            System.out.println("Алгоритм: " + statistics.algorithmName());
+            System.out.println("Поле: " + statistics.sortField());
+            System.out.println("Сравнений: " + statistics.comparisons());
+            System.out.println("Перемещений: " + statistics.swaps());
+            System.out.printf("Время: %.3f мс%n", statistics.durationMillis());
+            System.out.println("Количество элементов: " + statistics.size());
+            System.out.println("--------------------------------------------------");
+            System.out.println("Отсортированная коллекция:");
+
+            for (Car car : cars) {
+                System.out.println(car);
+            }
+
+            if (input.readYesNo("Дописать отсортированную коллекцию в файл history.txt?")) {
+                saver.appendCollection(
+                        "history.txt",
+                        cars,
+                        "Результат сортировки ("
+                                + statistics.algorithmName()
+                                + " по " + sortField + ")"
                 );
             }
-        }
-
-        SortStrategy strategy = switch (algorithmId) {
-            case 1 -> new InsertionSort(sortField);
-            case 2 -> new MergeSort(sortField);
-            case 3 -> new EvenPowerInsertionSort();
-            case 4 -> new EvenPowerMergeSort();
-            default -> throw new IllegalArgumentException(
-                    "Неизвестный алгоритм сортировки: " + algorithmId
-            );
-        };
-
-        SortingStatistics statistics = strategy.sort(cars, comparator);
-
-        System.out.println("Сортировка завершена.");
-        System.out.println("Алгоритм: " + statistics.algorithmName());
-        System.out.println("Поле: " + statistics.sortField());
-        System.out.println("Сравнений: " + statistics.comparisons());
-        System.out.println("Перемещений: " + statistics.swaps());
-        System.out.printf("Время: %.3f мс%n", statistics.durationMillis());
-        System.out.println("Количество элементов: " + statistics.size());
-        System.out.println("--------------------------------------------------");
-        System.out.println("Отсортированная коллекция:");
-        for (Car car : cars) {
-            System.out.println(car);
-        }
-
-        // Задача 15: Предлагаем дописать отсортированную коллекцию в файл
-        if (input.readYesNo("Дописать отсортированную коллекцию в файл history.txt?")) {
-            saver.appendCollection("history.txt", cars, "Результат сортировки (" + statistics.algorithmName() + " по " + sortField + ")");
+            return;
         }
     }
 }

@@ -12,6 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import astonteam.sorting.console.AttemptsExceededException;
+
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
 /**
  * Тесты для {@link ManualFiller}: ручной ввод автомобилей через консоль с валидацией и повторами.
  */
@@ -150,5 +154,55 @@ class ManualFillerTest {
             assertThrows(NullPointerException.class, () -> new ManualFiller(input, null));
             input.close();
         });
+    }
+
+    /**
+     * Проверяет, что после успешного ввода автомобиля счётчик ошибок
+     * сбрасывается перед вводом следующего автомобиля.
+     */
+    @Test
+    void successfulCarResetsFailedAttemptsBeforeNextCar() {
+        String inputData =
+                "ошибка\nошибка\nошибка\nошибка\n" +
+                        "150\nToyota\n2015\n" +
+                        "ошибка\nошибка\nошибка\nошибка\n" +
+                        "100\nAudi\n2020\n";
+
+        TestSupport.Outcome outcome = TestSupport.run(
+                inputData,
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        CarArrayList cars =
+                                new ManualFiller(input, validator).fill(2);
+
+                        assertEquals(2, cars.size());
+                        assertEquals("Toyota", cars.get(0).getModel());
+                        assertEquals("Audi", cars.get(1).getModel());
+                    }
+                }
+        );
+
+        assertNull(outcome.error());
+    }
+
+    /**
+     * Проверяет, что пять ошибок при вводе одного автомобиля
+     * прерывают заполнение коллекции.
+     */
+    @Test
+    void fiveErrorsWithinOneCarThrowAttemptsExceededException() {
+        TestSupport.Outcome outcome = TestSupport.run(
+                "ошибка\nошибка\nошибка\nошибка\nошибка\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        new ManualFiller(input, validator).fill(1);
+                    }
+                }
+        );
+
+        assertInstanceOf(
+                AttemptsExceededException.class,
+                outcome.error()
+        );
     }
 }
