@@ -6,8 +6,11 @@ import astonteam.sorting.console.ConsoleInput;
 import astonteam.sorting.model.Car;
 import astonteam.sorting.validation.CarValidator;
 import astonteam.sorting.validation.ValidationResult;
+import astonteam.sorting.console.AttemptsExceededException;
+import astonteam.sorting.console.EndOfInputException;
 
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Заполняет коллекцию автомобилей данными, вводимыми пользователем с консоли.
@@ -38,7 +41,8 @@ public final class ManualFiller {
     }
 
     /**
-     * Запрашивает у пользователя указанное число автомобилей.
+     * Запрашивает у пользователя указанное число автомобилей
+     * и заполняет коллекцию через последовательный stream.
      *
      * @param size количество автомобилей для ввода
      * @return заполненная коллекция автомобилей
@@ -53,9 +57,9 @@ public final class ManualFiller {
         }
         System.out.printf("Введите %d автомобилей, заполняя поля по одному:%n", size);
         CarArrayList cars = new CarArrayList();
-        for (int i = 1; i <= size; i++) {
-            cars.add(readCar(i));
-        }
+        IntStream.rangeClosed(1, size)
+                .mapToObj(this::readCar)
+                .forEach(cars::add);
         return cars;
     }
 
@@ -68,9 +72,9 @@ public final class ManualFiller {
     private Car readCar(int index) {
         while (true) {
             System.out.printf("Автомобиль %d:%n", index);
-            int power = readIntField(POWER_LABEL, "мощность");
+            int power = readPowerField();
             String model = readModelField(MODEL_LABEL);
-            int year = readIntField(YEAR_LABEL, "год производства");
+            int year = readYearField();
             Car car = validateAndBuild(power, model, year);
             if (car != null) {
                 input.markSuccess();
@@ -103,6 +107,35 @@ public final class ManualFiller {
     }
 
     /**
+     * Запрашивает мощность и повторяет ввод до получения значения
+     * из допустимого диапазона.
+     *
+     * @return корректная мощность автомобиля
+     * @throws AttemptsExceededException если достигнут предел ошибок
+     * @throws EndOfInputException если поток ввода завершён
+     */
+    private int readPowerField() {
+        while (true) {
+            int power = readIntField(POWER_LABEL, "мощность");
+
+            if (power < 0) {
+                input.reportError("Мощность не может быть отрицательной.");
+                continue;
+            }
+
+            if (power < Limits.MIN_POWER || power > Limits.MAX_POWER) {
+                input.reportError(
+                        "Мощность должна быть в диапазоне от "
+                                + Limits.MIN_POWER + " до " + Limits.MAX_POWER + "."
+                );
+                continue;
+            }
+
+            return power;
+        }
+    }
+
+    /**
      * Считывает модель, проверяя её на пустоту и длину.
      *
      * @param label подпись для приглашения ввода
@@ -120,6 +153,30 @@ public final class ManualFiller {
                 continue;
             }
             return line;
+        }
+    }
+
+    /**
+     * Запрашивает год выпуска и повторяет ввод до получения значения
+     * из допустимого диапазона.
+     *
+     * @return корректный год выпуска автомобиля
+     * @throws AttemptsExceededException если достигнут предел ошибок
+     * @throws EndOfInputException если поток ввода завершён
+     */
+    private int readYearField() {
+        while (true) {
+            int year = readIntField(YEAR_LABEL, "год производства");
+
+            if (year < Limits.MIN_YEAR || year > Limits.MAX_YEAR) {
+                input.reportError(
+                        "Год должен быть в диапазоне от "
+                                + Limits.MIN_YEAR + " до " + Limits.MAX_YEAR + "."
+                );
+                continue;
+            }
+
+            return year;
         }
     }
 

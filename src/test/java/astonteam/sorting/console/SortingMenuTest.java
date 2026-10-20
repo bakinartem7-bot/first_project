@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Тесты меню сортировки: выбор алгоритма и ключа сортировки,
@@ -190,5 +191,77 @@ class SortingMenuTest {
         );
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Сначала заполните коллекцию автомобилями."));
+    }
+
+    /**
+     * Проверяет, что выбор пункта "Назад в главное меню"
+     * возвращает в главное меню.
+     */
+    @Test
+    void whenBackSelectedInAlgorithmMenuThenCollectionIsNotChanged() {
+        CarArrayList cars = new CarArrayList();
+        Car first = Car.builder()
+                .model("Toyota")
+                .power(150)
+                .year(2020)
+                .build();
+        Car second = Car.builder()
+                .model("Audi")
+                .power(100)
+                .year(2019)
+                .build();
+
+        cars.add(first);
+        cars.add(second);
+
+        TestSupport.Outcome outcome = TestSupport.run(
+                "5\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SortingMenu.sortCars(cars, input, new ResultSaver());
+                    }
+                }
+        );
+
+        assertNull(outcome.error());
+        assertSame(first, cars.get(0));
+        assertSame(second, cars.get(1));
+        assertFalse(outcome.output().contains("Сортировка завершена."));
+    }
+
+    /**
+     * Проверяет, что выбор пункта "Назад к выбору алгоритма"
+     * возвращает в меню выбора.
+     */
+    @Test
+    void whenBackSelectedInFieldMenuThenReturnsToAlgorithmMenu() {
+        CarArrayList cars = new CarArrayList();
+        Car first = Car.builder()
+                .model("Toyota")
+                .power(150)
+                .year(2020)
+                .build();
+        Car second = Car.builder()
+                .model("Audi")
+                .power(100)
+                .year(2019)
+                .build();
+
+        cars.add(first);
+        cars.add(second);
+
+        TestSupport.Outcome outcome = TestSupport.run(
+                "1\n4\n5\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SortingMenu.sortCars(cars, input, new ResultSaver());
+                    }
+                }
+        );
+
+        assertNull(outcome.error());
+        assertSame(first, cars.get(0));
+        assertSame(second, cars.get(1));
+        assertFalse(outcome.output().contains("Сортировка завершена."));
     }
 }

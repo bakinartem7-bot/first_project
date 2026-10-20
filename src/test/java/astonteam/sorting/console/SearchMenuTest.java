@@ -171,4 +171,58 @@ class SearchMenuTest {
         assertNull(outcome.error());
         assertFalse(outcome.output().contains("Найденные автомобили:"));
     }
+
+    /**
+     * Проверяет, что отрицательная мощность отклоняется с сообщением об ошибке,
+     * после чего повторно запрашивается только мощность.
+     * После корректного ввода найденный автомобиль выводится пользователю.
+     */
+    @Test
+    void whenPowerIsNegativeThenPrintsErrorAndRequestsPowerAgain() {
+        CarArrayList cars = new CarArrayList();
+        cars.add(Car.builder()
+                .power(100)
+                .model("Bmw")
+                .year(2021)
+                .build());
+        TestSupport.Outcome outcome = TestSupport.run(
+                "1\n-100\n100\nнет\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SearchMenu.searchCars(cars, input, new ResultSaver());
+                    }
+                }
+        );
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Мощность не может быть отрицательной."));
+        assertTrue(outcome.output().contains("Найденные автомобили:"));
+        assertTrue(outcome.output().contains("Мощность: 100"));
+    }
+
+    /**
+     * Проверяет, что год вне допустимого диапазона отклоняется,
+     * после чего повторно запрашивается только год выпуска.
+     * После корректного ввода найденный автомобиль выводится пользователю.
+     */
+    @Test
+    void whenInvalidYearEnteredThenOnlyYearIsRequestedAgain() {
+        CarArrayList cars = new CarArrayList();
+        cars.add(Car.builder()
+                .power(150)
+                .model("Toyota")
+                .year(2022)
+                .build());
+        TestSupport.Outcome outcome = TestSupport.run(
+                "3\n1800\n2022\nнет\n",
+                () -> {
+                    try (ConsoleInput input = new ConsoleInput()) {
+                        SearchMenu.searchCars(cars, input, new ResultSaver());
+                    }
+                }
+        );
+        assertNull(outcome.error());
+        assertTrue(outcome.output().contains("Год выпуска должен быть в диапазоне"));
+        assertTrue(outcome.output().contains("Найденные автомобили:"));
+        assertTrue(outcome.output().contains("Toyota"));
+    }
 }

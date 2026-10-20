@@ -54,7 +54,7 @@ public final class CarLineFormat {
         if (trimmed.isEmpty()) {
             throw new IllegalArgumentException("Строка не должна быть пустой");
         }
-        String[] parts = trimmed.split(DELIMITER);
+        String[] parts = trimmed.split(DELIMITER, -1);
 
         if (parts.length > 3) {
             throw new IllegalArgumentException("Модель содержит недопустимый символ-разделитель '" + DELIMITER + "'");
