@@ -92,6 +92,25 @@ class MenuScenarioTest {
     }
 
     /**
+     * Проверяет, что обе строки присутствуют в выводе и первая строка
+     * расположена раньше второй.
+     *
+     * @param output текст консольного вывода
+     * @param first  строка, которая должна находиться раньше
+     * @param second строка, которая должна находиться позже
+     */
+    private static void assertAppearsBefore(String output, String first, String second) {
+        int firstIndex = output.indexOf(first);
+        int secondIndex = output.indexOf(second);
+        assertTrue(firstIndex >= 0, "В выводе должна присутствовать строка: " + first);
+        assertTrue(secondIndex >= 0, "В выводе должна присутствовать строка: " + second);
+        assertTrue(
+                firstIndex < secondIndex,
+                "\"" + first + "\" должна находиться раньше \"" + second + "\""
+        );
+    }
+
+    /**
      * Позитивный сценарий: ручное заполнение → сортировка по мощности →
      * сохранение в файл → выход.
      */
@@ -113,10 +132,7 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Файл сохранён"));
         assertTrue(outcome.output().contains("Работа завершена."));
         assertTrue(Files.exists(carsFile()));
-        assertTrue(
-                outcome.output().indexOf("Мощность: 100") < outcome.output().indexOf("Мощность: 150"),
-                "автомобили должны быть отсортированы по мощности по возрастанию"
-        );
+        assertAppearsBefore(outcome.output(), "Мощность: 100", "Мощность: 150");
     }
 
     /**
@@ -159,10 +175,7 @@ class MenuScenarioTest {
         assertTrue(outcome.output().contains("Автомобилей загружено: 2"));
         assertTrue(outcome.output().contains("Алгоритм: InsertionSort"));
         assertTrue(outcome.output().contains("Работа завершена."));
-        assertTrue(
-                outcome.output().indexOf("Год: 2015") < outcome.output().indexOf("Год: 2018"),
-                "автомобили должны быть отсортированы по году по возрастанию"
-        );
+        assertAppearsBefore(outcome.output(), "Год: 2015", "Год: 2018");
     }
 
     /**
@@ -364,18 +377,21 @@ class MenuScenarioTest {
     /**
      * Отрицательный сценарий: модель с символом «;» отклоняется ещё при вводе,
      * так как этот символ является разделителем полей в файле.
+     * После чего повторно запрашивается только поле модели.
      */
     @Test
     void modelWithFileDelimiterIsRejectedAtInput() {
         TestSupport.Outcome outcome = runMain(lines(
                 "1", "1", "1",
-                "150", "Toyota;Corolla", "2015",
-                "150", "Toyota", "2015",
+                "150",
+                "Toyota;Corolla",
+                "Toyota",
+                "2015",
                 "8"
         ));
 
         assertNull(outcome.error());
-        assertTrue(outcome.output().contains("не должна содержать символ"));
+        assertTrue(outcome.output().contains("Модель не должна содержать символ «;»."));
         assertTrue(outcome.output().contains("Автомобилей введено: 1"));
         assertTrue(outcome.output().contains("Работа завершена."));
     }
