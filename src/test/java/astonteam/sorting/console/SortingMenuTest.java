@@ -78,6 +78,7 @@ class SortingMenuTest {
         CarArrayList cars = new CarArrayList();
         cars.add(Car.builder().model("Toyota").power(150).year(2020).build());
         cars.add(Car.builder().model("Audi").power(100).year(2020).build());
+
         TestSupport.Outcome outcome = TestSupport.run(
                 "2\n2\nнет\n",
                 () -> {
@@ -86,15 +87,12 @@ class SortingMenuTest {
                     }
                 }
         );
+
         assertNull(outcome.error());
         assertEquals("Audi", cars.get(0).getModel());
         assertEquals("Toyota", cars.get(1).getModel());
         assertTrue(outcome.output().contains("Алгоритм: MergeSort"));
-        String output = outcome.output();
-        assertTrue(
-                output.indexOf("Audi") < output.indexOf("Toyota"),
-                "Audi должна идти перед Toyota в выводе"
-        );
+        assertAppearsBefore(outcome.output(), "Audi", "Toyota");
     }
 
     /**
@@ -263,5 +261,21 @@ class SortingMenuTest {
         assertSame(first, cars.get(0));
         assertSame(second, cars.get(1));
         assertFalse(outcome.output().contains("Сортировка завершена."));
+    }
+
+    /**
+     * Проверяет, что обе строки присутствуют в выводе и первая строка
+     * расположена раньше второй.
+     *
+     * @param output текст консольного вывода
+     * @param first  строка, которая должна находиться раньше
+     * @param second строка, которая должна находиться позже
+     */
+    private static void assertAppearsBefore(String output, String first, String second) {
+        int firstIndex = output.indexOf(first);
+        int secondIndex = output.indexOf(second);
+        assertTrue(firstIndex >= 0, "В выводе должна присутствовать строка: " + first);
+        assertTrue(secondIndex >= 0, "В выводе должна присутствовать строка: " + second);
+        assertTrue(firstIndex < secondIndex, "\"" + first + "\" должна находиться раньше \"" + second + "\"");
     }
 }

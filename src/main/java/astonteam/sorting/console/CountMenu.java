@@ -29,15 +29,8 @@ public final class CountMenu {
         }
 
         System.out.println("Введите автомобиль для подсчёта вхождений:");
-        int power = input.readInt("Введите мощность: ");
-        String model = input.readNonBlank("Введите модель: ");
-        int year = input.readInt("Введите год выпуска: ");
-
-        Car target = Car.builder()
-                .power(power)
-                .model(model)
-                .year(year)
-                .build();
+        CarInputReader carInputReader = new CarInputReader(input);
+        Car target = carInputReader.readCar();
 
         int found = counter.countOccurrences(cars, target);
         System.out.println("Количество вхождений в коллекцию: " + found);
