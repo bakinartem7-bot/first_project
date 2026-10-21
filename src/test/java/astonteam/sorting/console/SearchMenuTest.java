@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -132,6 +133,24 @@ class SearchMenuTest {
         assertNull(outcome.error());
         assertTrue(outcome.output().contains("Мощность: 150; Модель: Toyota; Год: 2021"));
         assertFalse(outcome.output().contains("Мощность: 2000; Модель: toyota; Год: 1999"));
+    }
+
+    /**
+     * Проверяет, что при ответе «да» результат поиска дописывается в history.txt
+     * с шапкой действия и данными найденных автомобилей.
+     *
+     * @throws Exception при чтении записанного файла
+     */
+    @Test
+    void whenSearchingWithAppendThenWritesHistory() throws Exception {
+        TestSupport.Outcome outcome = runSearch("1\n150\nда\n", cars);
+
+        assertNull(outcome.error());
+        Path history = tempDir.resolve("history.txt");
+        assertTrue(Files.exists(history));
+        String content = Files.readString(history);
+        assertTrue(content.contains("Результат поиска"));
+        assertTrue(content.contains("150;Toyota;2021"));
     }
 
     /**

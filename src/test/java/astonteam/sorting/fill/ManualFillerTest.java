@@ -106,9 +106,25 @@ class ManualFillerTest {
      */
     @Test
     void fillRetriesAfterEmptyModel() {
-        TestSupport.run("\nToyota\n150\nToyota\n2015\n", () -> {
+        TestSupport.run("150\n\nToyota\n2015\n", () -> {
             ConsoleInput input = new ConsoleInput();
             CarArrayList cars = new ManualFiller(input, validator).fill(1);
+            assertEquals("Toyota", cars.get(0).getModel());
+            input.close();
+        });
+    }
+
+    /**
+     * Проверяет, что модель длиннее {@link Limits#MAX_MODEL_LENGTH} отклоняется
+     * и запрашивается повторный ввод модели.
+     */
+    @Test
+    void fillRetriesAfterTooLongModel() {
+        String tooLong = "A".repeat(Limits.MAX_MODEL_LENGTH + 1);
+        TestSupport.run("150\n" + tooLong + "\nToyota\n2015\n", () -> {
+            ConsoleInput input = new ConsoleInput();
+            CarArrayList cars = new ManualFiller(input, validator).fill(1);
+            assertEquals(1, cars.size());
             assertEquals("Toyota", cars.get(0).getModel());
             input.close();
         });

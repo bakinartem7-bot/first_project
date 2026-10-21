@@ -76,7 +76,10 @@ public class Main {
                         case 5 -> CountMenu.countCars(cars, input, counter);
                         case 6 -> HistoryMenu.showHistory(saver);
                         case 7 -> saveCollection(cars, input, saver);
-                        case 8 -> running = false;
+                        case 8 -> {
+                            offerSaveBeforeExit(cars, input, saver);
+                            running = false;
+                        }
                         default -> System.out.println("Пункт в работе.");
                     }
                 } catch (AttemptsExceededException | IllegalArgumentException | UncheckedIOException e) {
@@ -107,6 +110,28 @@ public class Main {
             saver.saveCollection(COLLECTION_FILE, cars);
         } else {
             System.out.println("Сохранение отменено.");
+        }
+    }
+
+    /**
+     * Перед завершением работы предлагает сохранить непустую коллекцию.
+     * Пустая коллекция не сохраняется и вопрос не задаётся:
+     * сохранять нечего, а вопрос сбивает с толку.
+     *
+     * @param cars   рабочая коллекция автомобилей
+     * @param input  источник ввода для подтверждения
+     * @param saver  сохранитель файлов результатов
+     */
+    private static void offerSaveBeforeExit(CarArrayList cars, ConsoleInput input, ResultSaver saver) {
+        if (cars.size() == 0) {
+            return;
+        }
+        try {
+            if (input.readYesNo("Сохранить коллекцию перед выходом")) {
+                saver.saveCollection(COLLECTION_FILE, cars);
+            }
+        } catch (UncheckedIOException e) {
+            System.out.println("Не удалось сохранить коллекцию: " + e.getMessage());
         }
     }
 }

@@ -201,4 +201,18 @@ class CarValidatorTest {
         assertEquals(expectedMessage, belowMinimum.message());
         assertEquals(expectedMessage, aboveMaximum.message());
     }
+
+    /**
+     * Проверяет, что модель длиннее {@link Limits#MAX_MODEL_LENGTH} символов
+     * отклоняется с понятным сообщением.
+     */
+    @Test
+    void rejectsTooLongModel() {
+        String tooLong = "A".repeat(Limits.MAX_MODEL_LENGTH + 1);
+
+        ValidationResult result = validator.validate(150, tooLong, 2015);
+
+        assertFalse(result.isValid());
+        assertTrue(result.message().contains("длиннее " + Limits.MAX_MODEL_LENGTH));
+    }
 }
