@@ -14,6 +14,6 @@ public final class AttemptsExceededException extends RuntimeException {
      * @param attempts допустимое число попыток ввода
      */
     public AttemptsExceededException(int attempts) {
-        super("Превышено число попыток ввода (" + attempts + "). Возврат в меню.");
+        super("Превышено число попыток ввода (" + attempts + ").");
     }
 }

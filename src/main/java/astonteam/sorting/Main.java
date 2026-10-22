@@ -83,7 +83,8 @@ public class Main {
                         default -> System.out.println("Пункт в работе.");
                     }
                 } catch (AttemptsExceededException | IllegalArgumentException | UncheckedIOException e) {
-                    System.out.println("Ошибка: " + e.getMessage() + " Возврат в меню.");
+                    System.out.println("Ошибка: " + e.getMessage());
+                    System.out.println("Возврат в меню.");
                 }
             }
         } catch (EndOfInputException e) {
